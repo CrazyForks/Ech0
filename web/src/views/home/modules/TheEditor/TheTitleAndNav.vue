@@ -25,7 +25,7 @@
       <!--
       <div>
         <a href="https://github.com/lin-snow/Ech0" target="_blank" title="Github">
-          <Github class="w-6 sm:w-7 h-6 sm:h-7 text-gray-400" />
+          <Github class="w-6 sm:w-7 h-6 sm:h-7 text-[var(--text-color-400)]" />
         </a>
       </div>
       -->

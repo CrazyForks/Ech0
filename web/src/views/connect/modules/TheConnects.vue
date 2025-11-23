@@ -8,7 +8,9 @@
         <Connect class="mr-2" />我的连接:
       </h2>
       <div v-if="!loading">
-        <div v-if="!connectsInfo.length" class="text-stone-400 text-sm mb-2">当前暂无连接</div>
+        <div v-if="!connectsInfo.length" class="text-[var(--text-color-next-400)] text-sm mb-2">
+          当前暂无连接
+        </div>
         <div v-else class="flex flex-wrap gap-3">
           <div
             v-for="(connect, index) in connectsInfo"
@@ -43,7 +45,7 @@
         </div>
       </div>
       <div v-else>
-        <div class="text-stone-500 text-sm mb-2">加载中...</div>
+        <div class="text-[var(--text-color-next-500)] text-sm mb-2">加载中...</div>
       </div>
     </div>
   </div>

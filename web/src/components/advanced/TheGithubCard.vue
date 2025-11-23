@@ -15,11 +15,16 @@
         </div>
 
         <div v-if="CardData" class="py-1">
-          <span class="text-lg font-bold text-gray-600">{{ CardData?.name || repo }}</span>
-          <p class="text-sm text-gray-400 font-mono line-clamp-2" :title="CardData?.description">
+          <span class="text-lg font-bold text-[var(--text-color-600)]">{{
+            CardData?.name || repo
+          }}</span>
+          <p
+            class="text-sm text-[var(--text-color-400)] font-mono line-clamp-2"
+            :title="CardData?.description"
+          >
             {{ CardData?.description }}
           </p>
-          <div class="flex justify-start items-center h-auto text-gray-500">
+          <div class="flex justify-start items-center h-auto text-[var(--text-color-500)]">
             <!-- star -->
             <Star class="w-4 h-4 mr-1" /> <span> {{ CardData?.stargazers_count }} </span>
             <!-- fork -->

@@ -7,7 +7,7 @@
         <div class="shrink-0 px-2">
           <Link class="w-5 h-5" />
         </div>
-        <span class="text-lg font-bold text-gray-600 truncate max-w-30">{{
+        <span class="text-lg font-bold text-[var(--text-color-600)] truncate max-w-30">{{
           websiteInfo.title
         }}</span>
       </div>

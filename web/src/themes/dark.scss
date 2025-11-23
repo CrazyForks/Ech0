@@ -6,9 +6,28 @@
 
   // 主体
   --bg-color: #333333;
+  --bg-color-50: oklch(0.15 0 0);
+  --bg-color-100: oklch(0.2 0 0);
+  --bg-color-300: oklch(0.3 0 0);
   --text-color: #afaaa6;
-  --text-color-400: oklch(70.7% 0.022 261.325);
-  --text-color-600: oklch(44.6% 0.03 256.802);
+  --text-color-200: oklch(0.7 0 0);
+  --text-color-next-200: oklch(0.75 0 0);
+  --text-color-300: oklch(0.8 0 0);
+  --text-color-next-300: oklch(0.85 0 0);
+  --text-color-400: oklch(0.97 0.01 136.32);
+  --text-color-next-400: oklch(0.98 0.02 81.44 / 0.71);
+  --text-color-500: oklch(0.98 0 0);
+  --text-color-next-500: oklch(0.97 0.01 136.32);
+  --text-color-600: oklch(0.98 0.02 81.44 / 0.71);
+  --text-color-next-600: oklch(0.97 0.01 136.32);
+  --text-color-700: oklch(0.98 0.02 81.44 / 0.71);
+  --text-color-next-700: oklch(0.97 0.01 136.32);
+  --text-color-800: oklch(0.98 0.02 81.44 / 0.71);
+  --text-color-900: oklch(0.98 0.02 81.44 / 0.71);
+  --border-color-300: oklch(0.44 0 0);
+  --border-color-400: oklch(0.43 0 0);
+  --divide-color-100: oklch(0.4 0 0);
+  --divide-color-200: oklch(0.32 0 0);
 
   --ring-color: oklch(0.32 0 0);
   --dash-line-color: oklch(0.33 0 0);
@@ -22,6 +41,7 @@
   --player-button-hover-bg-color: #5a4032;
 
   // 编辑器
+  --theboard-border-color: #f2f2f2;
   --editor-bg-color: #262626;
   --editor-text-color: oklch(0.98 0 0);
   --editor-title-color: oklch(0.9 0.01 136.32);

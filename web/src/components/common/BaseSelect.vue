@@ -31,7 +31,12 @@
       >
         <!-- Selected Value Display -->
         <span
-          :class="['truncate', !selectedOption && placeholder ? 'text-gray-500' : 'text-gray-600']"
+          :class="[
+            'truncate',
+            !selectedOption && placeholder
+              ? 'text-[var(--text-color-500)]'
+              : 'text-[var(--text-color-600)]',
+          ]"
         >
           {{ displayValue }}
         </span>
@@ -63,7 +68,7 @@
       >
         <div
           v-show="isOpen"
-          class="absolute z-50 mt-1 min-w-full bg-[var(--select-bg-color)] shadow-lg max-h-70 rounded-lg border border-[var(--select-border-color)] overflow-auto focus:outline-none"
+          class="absolute z-5000 mt-1 min-w-full bg-[var(--select-bg-color)] shadow-lg max-h-70 rounded-lg border border-[var(--select-border-color)] overflow-auto focus:outline-none"
         >
           <div
             v-for="(option, index) in normalizedOptions"
@@ -72,14 +77,16 @@
               'cursor-pointer select-none relative px-3 py-2 text-sm',
               index === highlightedIndex
                 ? 'bg-[var(--select-label-hover-bg-color)] text-orange-900'
-                : 'text-gray-900 hover:bg-[var(--select-label-clicked-bg-color)]',
+                : 'text-[var(--text-color-900)] hover:bg-[var(--select-label-clicked-bg-color)]',
               isSelected(option) ? 'font-medium' : 'font-normal',
             ]"
             @click="onSelect(option)"
             @mouseenter="highlightedIndex = index"
           >
             <div class="flex items-center justify-between">
-              <span class="truncate text-gray-500 font-bold">{{ getOptionLabel(option) }}</span>
+              <span class="truncate text-[var(--text-color-500)] font-bold">{{
+                getOptionLabel(option)
+              }}</span>
               <!-- Check Icon for Selected -->
               <svg
                 v-if="isSelected(option)"
@@ -101,7 +108,7 @@
           <!-- Empty State -->
           <div
             v-if="normalizedOptions.length === 0"
-            class="px-3 py-2 text-sm text-gray-500 text-center"
+            class="px-3 py-2 text-sm text-[var(--text-color-500)] text-center"
           >
             {{ emptyText }}
           </div>
