@@ -763,7 +763,7 @@ func buildObjectKey(userID uint, fileName, prefix string) (string, error) {
 func (commonService *CommonService) GetWebsiteTitle(websiteURL string) (string, error) {
 	websiteURL = httpUtil.TrimURL(websiteURL)
 
-	body, err := httpUtil.SendRequest(websiteURL, "GET", httpUtil.Header{})
+	body, err := httpUtil.SendRequest(websiteURL, "GET", httpUtil.Header{}, 10*time.Second)
 	if err != nil {
 		return "", err
 	}
