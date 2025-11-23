@@ -6,7 +6,7 @@
         <img
           :src="logo"
           alt="logo"
-          class="w-6 sm:w-7 h-6 sm:h-7 rounded-full ring-1 ring-gray-200 shadow-sm object-cover"
+          class="w-6 sm:w-7 h-6 sm:h-7 rounded-full ring-1 ring-[var(--ring-color)] shadow-sm object-cover"
         />
       </div>
       <h1 class="text-[var(--editor-title-color)] font-bold sm:text-xl">

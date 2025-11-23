@@ -55,7 +55,7 @@
           <ComboboxOptions
             static
             v-if="dropdownOpen && (filteredOptions.length > 0 || allowCreate)"
-            class="w-auto! absolute z-10 mt-2 max-h-64 overflow-y-scroll rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            class="w-auto! absolute z-10 mt-2 max-h-64 overflow-y-scroll rounded-md bg-[var(--combobox-bg-color)] py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           >
             <!-- Existing Options -->
             <div

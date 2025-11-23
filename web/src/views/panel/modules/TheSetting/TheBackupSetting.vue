@@ -13,7 +13,7 @@
           <BaseButton
             :icon="CreateBackup"
             @click="handleBackup"
-            class="rounded-lg bg-gray-100! text-gray-600! hover:bg-gray-200!"
+            class="rounded-lg text-gray-600!"
             title="创建快照"
           />
         </div>
@@ -23,7 +23,7 @@
           <BaseButton
             :icon="ExportBackup"
             @click="handleBackupExport"
-            class="rounded-lg bg-gray-100! text-gray-600! hover:bg-gray-200!"
+            class="rounded-lg text-gray-600!"
             title="导出快照"
           />
         </div>
@@ -33,7 +33,7 @@
           <BaseButton
             :icon="RestoreBackup"
             @click="handleBackupRestore"
-            class="rounded-lg bg-gray-100! text-gray-600! hover:bg-gray-200!"
+            class="rounded-lg text-gray-600!"
             title="恢复快照"
           />
         </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 my-3 border border-dashed border-gray-300 rounded-lg">
+  <div class="p-3 my-3 border border-dashed border-[var(--dash-line-color)] rounded-lg">
     <!-- 扩展附加内容 -->
     <div class="mb-1">
       <h2 class="text-gray-400 font-bold mb-1">扩展附加内容</h2>

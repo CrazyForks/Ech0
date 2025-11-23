@@ -216,11 +216,7 @@
               账号已绑定
             </p>
           </div>
-          <BaseButton
-            v-else
-            class="rounded-md mt-2 bg-stone-50! bg-op-80"
-            @click="handleBindOAuth2()"
-          >
+          <BaseButton v-else class="rounded-md mt-2" @click="handleBindOAuth2()">
             <div class="flex items-center justify-between">
               <component
                 :is="
