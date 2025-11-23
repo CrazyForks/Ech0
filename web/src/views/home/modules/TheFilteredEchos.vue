@@ -14,7 +14,7 @@
     <div v-if="echoStore.filteredHasMore && !echoStore.isLoading" class="mb-4 mt-1 -ml-2">
       <BaseButton
         @click="handleLoadMore"
-        class="rounded-full bg-white !active:bg-[var(--bg-color-100)]"
+        class="rounded-full bg-[var(--timeline-load-more-bg-color)] !active:bg-[var(--bg-color-100)]"
       >
         <span class="text-[var(--text-color-600)] text-md text-center px-2 py-1">继续装填</span>
       </BaseButton>

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-sm bg-white h-auto p-5 shadow rounded-lg mx-auto">
+  <div class="w-full max-w-sm bg-[var(--card-color)] h-auto p-5 shadow rounded-lg mx-auto">
     <!-- 顶部Logo 和 用户名 -->
     <div class="flex flex-row items-center gap-2 mt-2 mb-4">
       <!-- <div class="text-xl">👾</div> -->

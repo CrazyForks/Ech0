@@ -1,6 +1,6 @@
 <template>
   <article
-    class="relative flex flex-col gap-3 rounded-md bg-white px-5 py-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
+    class="relative flex flex-col gap-3 rounded-md bg-[var(--card-color)] px-5 py-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
   >
     <header class="flex items-center gap-3">
       <div
