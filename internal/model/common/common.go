@@ -43,7 +43,7 @@ type (
 	CommentProvider string
 	S3Provider      string
 	OAuth2Provider  string
-	AgentProvider string
+	AgentProvider   string
 )
 
 const (
@@ -88,12 +88,13 @@ const (
 )
 
 const (
-	OpenAI    AgentProvider = "openai"
-	DeepSeek  AgentProvider = "deepseek"
-	Anthropic AgentProvider = "anthropic"
-	Gemini    AgentProvider = "gemini"
-	AliBaiLian AgentProvider = "alibailian"
-	Ollama    AgentProvider = "ollama"
+	OpenAI     AgentProvider = "openai"
+	DeepSeek   AgentProvider = "deepseek"
+	Anthropic  AgentProvider = "anthropic"
+	Gemini     AgentProvider = "gemini"
+	AliBaiLian AgentProvider = "ali_bailian"
+	Ollama     AgentProvider = "ollama"
+	Custom     AgentProvider = "custom"
 )
 
 // key value表

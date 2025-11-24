@@ -339,7 +339,11 @@ func (commonService *CommonService) GenerateRSS(ctx *gin.Context) (string, error
 				case echoModel.ImageSourceS3:
 					imageURL = image.ImageURL
 				}
-				imageContent = fmt.Appendf(imageContent, "<img src=\"%s\" alt=\"Image\" style=\"max-width:100%%;height:auto;\" />", imageURL)
+				imageContent = fmt.Appendf(
+					imageContent,
+					"<img src=\"%s\" alt=\"Image\" style=\"max-width:100%%;height:auto;\" />",
+					imageURL,
+				)
 			}
 			renderedContent = append(imageContent, renderedContent...)
 		}

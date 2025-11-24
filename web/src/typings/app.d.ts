@@ -279,6 +279,22 @@ declare namespace App {
         enable: boolean
         cron_expression: string
       }
+
+      type AgentSetting = {
+        enable: boolean
+        provider: string
+        model: string
+        api_key: string
+        prompt: string
+      }
+
+      type AgentSettingDto = {
+        enable: boolean
+        provider: string
+        model: string
+        api_key: string
+        prompt: string
+      }
     }
 
     namespace Connect {

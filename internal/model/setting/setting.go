@@ -73,11 +73,11 @@ type FediverseSetting struct {
 
 // AgentSetting 定义 LLM Agent 设置实体
 type AgentSetting struct {
-	Enable bool `json:"enable"` // 是否启用 Agent 功能
+	Enable   bool   `json:"enable"`   // 是否启用 Agent 功能
 	Provider string `json:"provider"` // LLM 提供商 （OpenAI、DeepSeek、Anthropic、Gemini、阿里百炼、Ollama等）
-	Model   string `json:"model"`    // LLM 模型名称
-	ApiKey string `json:"api_key"`  // LLM API Key
-	Prompt string `json:"prompt"`   // Agent 额外使用的提示词
+	Model    string `json:"model"`    // LLM 模型名称
+	ApiKey   string `json:"api_key"`  // LLM API Key
+	Prompt   string `json:"prompt"`   // Agent 额外使用的提示词
 }
 
 type BackupSchedule struct {

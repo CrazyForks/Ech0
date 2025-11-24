@@ -10,12 +10,13 @@ import {
   fetchListAccessTokens,
   fetchGetFediverseSettings,
   fetchGetBackupScheduleSetting,
+  fetchGetAgentSettings,
   fetchHelloEch0,
 } from '@/service/api'
 import { localStg } from '@/utils/storage'
 import { theToast } from '@/utils/toast'
 import router from '@/router'
-import { CommentProvider, S3Provider, OAuth2Provider } from '@/enums/enums'
+import { CommentProvider, S3Provider, OAuth2Provider, AgentProvider } from '@/enums/enums'
 
 export const useSettingStore = defineStore('settingStore', () => {
   /**
@@ -70,6 +71,13 @@ export const useSettingStore = defineStore('settingStore', () => {
   const BackupSchedule = ref<App.Api.Setting.BackupSchedule>({
     enable: false,
     cron_expression: '0 2 * * 0',
+  })
+  const AgentSetting = ref<App.Api.Setting.AgentSetting>({
+    enable: false,
+    provider: AgentProvider.OPENAI,
+    model: '',
+    api_key: '',
+    prompt: '',
   })
   const hello = ref<App.Api.Ech0.HelloEch0>()
   const loading = ref<boolean>(true)
@@ -187,6 +195,13 @@ export const useSettingStore = defineStore('settingStore', () => {
     isSystemReady.value = status
   }
 
+  const getAgentSetting = async () => {
+    const res = await fetchGetAgentSettings()
+    if (res.code === 1) {
+      AgentSetting.value = res.data
+    }
+  }
+
   const init = () => {
     if (!isSystemReady.value) {
       getSystemReady()
@@ -207,6 +222,7 @@ export const useSettingStore = defineStore('settingStore', () => {
     AccessTokens,
     FediverseSetting,
     BackupSchedule,
+    AgentSetting,
     hello,
     loading,
 
@@ -221,6 +237,7 @@ export const useSettingStore = defineStore('settingStore', () => {
     setSystemReady,
     getHelloEch0,
     getBackupSchedule,
+    getAgentSetting,
     init,
   }
 })
