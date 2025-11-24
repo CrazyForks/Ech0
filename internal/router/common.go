@@ -11,7 +11,7 @@ func setupCommonRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	appRouterGroup.PublicRouterGroup.GET("/playmusic", h.CommonHandler.PlayMusic)
 	appRouterGroup.PublicRouterGroup.GET("/hello", h.CommonHandler.HelloEch0())
 	appRouterGroup.PublicRouterGroup.GET("/backup/export", h.BackupHandler.ExportBackup())
-	appRouterGroup.AuthRouterGroup.GET("/website/title", h.CommonHandler.GetWebsiteTitle())
+	appRouterGroup.PublicRouterGroup.GET("/website/title", h.CommonHandler.GetWebsiteTitle())
 
 	// Auth
 	appRouterGroup.AuthRouterGroup.POST("/images/upload", h.CommonHandler.UploadImage())
@@ -21,4 +21,5 @@ func setupCommonRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	appRouterGroup.AuthRouterGroup.GET("/backup", h.BackupHandler.Backup())
 	appRouterGroup.AuthRouterGroup.POST("/backup/import", h.BackupHandler.ImportBackup())
 	appRouterGroup.AuthRouterGroup.PUT("/s3/presign", h.CommonHandler.GetS3PresignURL())
+	
 }
