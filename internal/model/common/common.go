@@ -88,13 +88,13 @@ const (
 )
 
 const (
-	OpenAI     AgentProvider = "openai"
-	DeepSeek   AgentProvider = "deepseek"
-	Anthropic  AgentProvider = "anthropic"
-	Gemini     AgentProvider = "gemini"
-	Qwen       AgentProvider = "qwen"
-	Ollama     AgentProvider = "ollama"
-	Custom     AgentProvider = "custom"
+	OpenAI    AgentProvider = "openai"
+	DeepSeek  AgentProvider = "deepseek"
+	Anthropic AgentProvider = "anthropic"
+	Gemini    AgentProvider = "gemini"
+	Qwen      AgentProvider = "qwen"
+	Ollama    AgentProvider = "ollama"
+	Custom    AgentProvider = "custom"
 )
 
 // key value表
