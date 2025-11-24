@@ -840,6 +840,15 @@ func (settingService *SettingService) GetAgentSettings(setting *model.AgentSetti
 
 // UpdateAgentSettings 更新 Agent 设置
 func (settingService *SettingService) UpdateAgentSettings(userid uint, newSetting *model.AgentSettingDto) error {
+	// 检查用户权限
+	user, err := settingService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
+
 	if newSetting.Provider != string(commonModel.OpenAI) &&
 		newSetting.Provider != string(commonModel.DeepSeek) &&
 		newSetting.Provider != string(commonModel.Anthropic) &&
@@ -848,17 +857,8 @@ func (settingService *SettingService) UpdateAgentSettings(userid uint, newSettin
 		newSetting.Provider != string(commonModel.Ollama) {
 		newSetting.Provider = string(commonModel.OpenAI)
 	}
-	
-	return settingService.txManager.Run(func(ctx context.Context) error {
-		// 检查用户权限
-		user, err := settingService.commonService.CommonGetUserByUserId(userid)
-		if err != nil {
-			return err
-		}
-		if !user.IsAdmin {
-			return errors.New(commonModel.NO_PERMISSION_DENIED)
-		}
 
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		// 序列化为 JSON
 		settingToJSON, err := jsonUtil.JSONMarshal(newSetting)
 		if err != nil {
