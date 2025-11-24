@@ -121,7 +121,7 @@ const agentProviderOptions = ref<{ label: string; value: AgentProvider }[]>([
   { label: 'DeepSeek', value: AgentProvider.DEEPSEEK },
   { label: 'Anthropic', value: AgentProvider.ANTHROPIC },
   { label: 'Gemini', value: AgentProvider.GEMINI },
-  { label: '阿里百炼', value: AgentProvider.ALI_BAILIAN },
+  { label: 'Qwen', value: AgentProvider.QWEN },
   { label: 'Ollama', value: AgentProvider.OLLAMA },
   { label: '自定义', value: AgentProvider.CUSTOM },
 ])

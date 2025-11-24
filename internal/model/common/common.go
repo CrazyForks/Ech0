@@ -92,7 +92,7 @@ const (
 	DeepSeek   AgentProvider = "deepseek"
 	Anthropic  AgentProvider = "anthropic"
 	Gemini     AgentProvider = "gemini"
-	AliBaiLian AgentProvider = "ali_bailian"
+	Qwen       AgentProvider = "qwen"
 	Ollama     AgentProvider = "ollama"
 	Custom     AgentProvider = "custom"
 )

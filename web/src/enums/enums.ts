@@ -86,7 +86,7 @@ export enum AgentProvider {
   DEEPSEEK = 'deepseek',
   ANTHROPIC = 'anthropic',
   GEMINI = 'gemini',
-  ALI_BAILIAN = 'ali_bailian',
+  QWEN = 'qwen',
   OLLAMA = 'ollama',
   CUSTOM = 'custom',
 }
