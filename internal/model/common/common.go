@@ -43,6 +43,7 @@ type (
 	CommentProvider string
 	S3Provider      string
 	OAuth2Provider  string
+	AgentProvider string
 )
 
 const (
@@ -86,6 +87,15 @@ const (
 	OAuth2CUSTOM OAuth2Provider = "custom"
 )
 
+const (
+	OpenAI    AgentProvider = "openai"
+	DeepSeek  AgentProvider = "deepseek"
+	Anthropic AgentProvider = "anthropic"
+	Gemini    AgentProvider = "gemini"
+	AliBaiLian AgentProvider = "alibailian"
+	Ollama    AgentProvider = "ollama"
+)
+
 // key value表
 type KeyValue struct {
 	Key   string `json:"key"   gorm:"primaryKey"`
@@ -108,6 +118,8 @@ const (
 	FediverseSettingKey = "fediverse_setting"
 	// BackupScheduleKey 是备份计划设置的键
 	BackupScheduleKey = "backup_schedule"
+	// AgentSettingKey 是 Agent 设置的键
+	AgentSettingKey = "agent_setting"
 	// MigrationKey 是数据库迁移的标记键
 	MigrationKey = "db_migration:message_to_echo:v1"
 )
