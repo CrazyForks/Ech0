@@ -19,8 +19,18 @@ func NewAgentHandler(agentService service.AgentServiceInterface) *AgentHandler {
 
 func (agentHandler *AgentHandler) GetRecent() gin.HandlerFunc {
 	return res.Execute(func(ctx *gin.Context) res.Response {
+		// 调用服务层获取作者近况信息
+		context, err := agentHandler.agentService.GetRecent(ctx)
+		if err != nil {
+			return res.Response{
+				Msg: "获取作者近况失败",
+				Err: err,
+			}
+		}
+
 		return res.Response{
-			Msg: "获取作者近况成功",
+			Data: context,
+			Msg:  "获取作者近况成功",
 		}
 	})
 }

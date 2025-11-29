@@ -86,7 +86,7 @@ func BuildHandlers(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory,
 	monitorMonitor := monitor.NewMonitor(metricCollector)
 	dashboardServiceInterface := service9.NewDashboardService(monitorMonitor, commonServiceInterface)
 	dashboardHandler := handler10.NewDashboardHandler(dashboardServiceInterface)
-	agentServiceInterface := service10.NewAgentService()
+	agentServiceInterface := service10.NewAgentService(settingServiceInterface, echoServiceInterface, todoServiceInterface)
 	agentHandler := handler11.NewAgentHandler(agentServiceInterface)
 	handlers := NewHandlers(webHandler, userHandler, echoHandler, commonHandler, settingHandler, todoHandler, connectHandler, backupHandler, fediverseHandler, dashboardHandler, agentHandler)
 	return handlers, nil
