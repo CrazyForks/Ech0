@@ -78,6 +78,7 @@ export const useSettingStore = defineStore('settingStore', () => {
     model: '',
     api_key: '',
     prompt: '',
+    base_url: '',
   })
   const hello = ref<App.Api.Ech0.HelloEch0>()
   const loading = ref<boolean>(true)

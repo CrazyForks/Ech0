@@ -286,6 +286,7 @@ declare namespace App {
         model: string
         api_key: string
         prompt: string
+        base_url: string
       }
 
       type AgentSettingDto = {
@@ -294,6 +295,7 @@ declare namespace App {
         model: string
         api_key: string
         prompt: string
+        base_url: string
       }
     }
 

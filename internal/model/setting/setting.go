@@ -78,6 +78,7 @@ type AgentSetting struct {
 	Model    string `json:"model"`    // LLM 模型名称
 	ApiKey   string `json:"api_key"`  // LLM API Key
 	Prompt   string `json:"prompt"`   // Agent 额外使用的提示词
+	BaseURL  string `json:"base_url"` // 自定义 API URL（可选）
 }
 
 type BackupSchedule struct {

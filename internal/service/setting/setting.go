@@ -818,6 +818,7 @@ func (settingService *SettingService) GetAgentSettings(setting *model.AgentSetti
 			setting.Model = ""
 			setting.ApiKey = ""
 			setting.Prompt = ""
+			setting.BaseURL = ""
 
 			// 序列化为 JSON
 			settingToJSON, err := jsonUtil.JSONMarshal(setting)
@@ -858,9 +859,18 @@ func (settingService *SettingService) UpdateAgentSettings(userid uint, newSettin
 		newSetting.Provider = string(commonModel.OpenAI)
 	}
 
+	setting := &model.AgentSetting{
+		Enable:   newSetting.Enable,
+		Provider: newSetting.Provider,
+		Model:    newSetting.Model,
+		ApiKey:   newSetting.ApiKey,
+		Prompt:   newSetting.Prompt,
+		BaseURL:  httpUtil.TrimURL(newSetting.BaseURL),
+	}
+
 	return settingService.txManager.Run(func(ctx context.Context) error {
 		// 序列化为 JSON
-		settingToJSON, err := jsonUtil.JSONMarshal(newSetting)
+		settingToJSON, err := jsonUtil.JSONMarshal(setting)
 		if err != nil {
 			return err
 		}
