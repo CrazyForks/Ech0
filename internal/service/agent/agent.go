@@ -39,10 +39,18 @@ func NewAgentService(
 }
 
 func (agentService *AgentService) GetRecent(ctx context.Context) (string, error) {
+	in := []*schema.Message{
+		{
+			Role:    schema.System,
+			Content: "你是一个热心的个人助理，帮助用户管理他们的待办事项和回顾最近的活动。",
+		},
+		{
+			Role:    schema.User,
+			Content: "请告诉我我最近的待办事项和活动回顾。",
+		},
+	}
 
-	input := "请生成我的近期动态，包含我在待办事项中的重要任务和我最近创建的说说。"
-
-	output, err := agentService.Generate(ctx, input)
+	output, err := agentService.Generate(ctx, in)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +58,7 @@ func (agentService *AgentService) GetRecent(ctx context.Context) (string, error)
 	return output, nil
 }
 
-func (agentService *AgentService) Generate(ctx context.Context, input string) (string, error) {
+func (agentService *AgentService) Generate(ctx context.Context, in []*schema.Message) (string, error) {
 	var setting model.AgentSetting
 	if err := agentService.settingService.GetAgentSettings(&setting); err != nil {
 		return "", errors.New(commonModel.AGENT_SETTING_NOT_FOUND)
@@ -76,10 +84,6 @@ func (agentService *AgentService) Generate(ctx context.Context, input string) (s
 
 	apiKey := setting.ApiKey
 	model := setting.Model
-
-	in := []*schema.Message{
-		{Role: schema.User, Content: input},
-	}
 
 	var resp *schema.Message
 	var genErr error
