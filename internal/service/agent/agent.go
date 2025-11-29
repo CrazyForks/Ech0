@@ -120,6 +120,9 @@ func (agentService *AgentService) Generate(ctx context.Context, input string) (s
 		client, err := genai.NewClient(ctx, &genai.ClientConfig{
 			APIKey: apiKey,
 		})
+		if err != nil {
+			return "", err
+		}
 		cm, err := gemini.NewChatModel(ctx, &gemini.Config{
 			Client: client,
 			Model:  model,
