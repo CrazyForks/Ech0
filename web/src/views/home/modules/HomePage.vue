@@ -22,7 +22,8 @@
       <div class="mb-2">
         <TheAudioCard />
       </div>
-      <TheConnects />
+      <TheConnects class="mb-2" />
+      <TheRecentCard />
     </div>
   </div>
 </template>
@@ -36,6 +37,7 @@ import TheFilteredEchos from './TheFilteredEchos.vue'
 import TheTodos from './TheTodos.vue'
 import TheConnects from '@/views/connect/modules/TheConnects.vue'
 import TheTodoCard from '@/components/advanced/TheTodoCard.vue'
+import TheRecentCard from '@/components/advanced/TheRecentCard.vue'
 import TheStatusCard from '@/components/advanced/TheStatusCard.vue'
 import TheHeatMap from '@/components/advanced/TheHeatMap.vue'
 import { onMounted, ref, onBeforeUnmount } from 'vue'
