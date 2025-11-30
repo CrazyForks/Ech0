@@ -42,6 +42,16 @@ func Generate(ctx context.Context, setting model.AgentSetting, in []*schema.Mess
 
 	apiKey := setting.ApiKey
 	model := setting.Model
+	prompt := setting.Prompt
+	if prompt != "" {
+		// 在对话开头添加系统提示
+		in = append([]*schema.Message{
+			{
+				Role:    schema.User,
+				Content: prompt,
+			},
+		}, in...)
+	}
 
 	var resp *schema.Message
 	var genErr error
