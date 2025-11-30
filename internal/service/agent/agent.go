@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/cloudwego/eino-ext/components/model/claude"
 	"github.com/cloudwego/eino-ext/components/model/deepseek"
@@ -49,10 +50,19 @@ func (agentService *AgentService) GetRecent(ctx context.Context) (string, error)
 	}
 
 	var memos []*schema.Message
-	for _, echo := range echos.Items {
+	for i, e := range echos.Items {
+		content := fmt.Sprintf(
+			"用户 %s 在 %s 发布了内容 %d ：%s 。 内容标签为：%v。",
+			e.Username,
+			e.CreatedAt.Format("2006-01-02 15:04"),
+			i+1,
+			e.Content,
+			e.Tags,
+		)
+
 		memos = append(memos, &schema.Message{
-			Role:    schema.Assistant,
-			Content: echo.Content,
+			Role:    schema.System,
+			Content: content,
 		})
 	}
 
@@ -63,7 +73,7 @@ func (agentService *AgentService) GetRecent(ctx context.Context) (string, error)
 		},
 		{
 			Role:    schema.User,
-			Content: "请根据我最近的活动进行总结。",
+			Content: "请根据提供的近期互动内容（内容可能包括日常生活、句子诗词摘抄、吐槽等等），总结该用户最近的活动和状态，突出作者状态即可，不需要详细描述内容，如果没有任何内容，请回复作者最近很神秘。",
 		},
 	}
 
