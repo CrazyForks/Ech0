@@ -91,7 +91,7 @@
       </div>
 
       <!-- Prompt -->
-      <div class="flex justify-start text-[var(--text-color-next-500)] gap-2 mt-2">
+      <!-- <div class="flex justify-start text-[var(--text-color-next-500)] gap-2 mt-2">
         <h2 class="font-semibold w-24 shrink-0">Prompt:</h2>
         <span v-if="!agentEditMode" class="truncate max-w-60 inline-block align-middle">
           {{ AgentSetting.prompt.length == 0 ? '暂无' : '' }}
@@ -103,7 +103,7 @@
           class="w-full"
           :rows="4"
         />
-      </div>
+      </div> -->
     </div>
   </PanelCard>
 </template>
