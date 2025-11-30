@@ -8,6 +8,7 @@ func setupSettingRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	appRouterGroup.PublicRouterGroup.GET("/settings", h.SettingHandler.GetSettings())
 	appRouterGroup.PublicRouterGroup.GET("/comment/settings", h.SettingHandler.GetCommentSettings())
 	appRouterGroup.PublicRouterGroup.GET("/oauth2/status", h.SettingHandler.GetOAuth2Status())
+	appRouterGroup.PublicRouterGroup.GET("/agent/settings", h.SettingHandler.GetAgentSettings())
 
 	// Auth
 	appRouterGroup.AuthRouterGroup.PUT("/settings", h.SettingHandler.UpdateSettings())
@@ -35,6 +36,5 @@ func setupSettingRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	appRouterGroup.AuthRouterGroup.GET("/backup/schedule", h.SettingHandler.GetBackupScheduleSetting())
 	appRouterGroup.AuthRouterGroup.POST("/backup/schedule", h.SettingHandler.UpdateBackupScheduleSetting())
 
-	appRouterGroup.AuthRouterGroup.GET("/agent/settings", h.SettingHandler.GetAgentSettings())
 	appRouterGroup.AuthRouterGroup.PUT("/agent/settings", h.SettingHandler.UpdateAgentSettings())
 }

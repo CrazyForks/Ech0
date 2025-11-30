@@ -835,6 +835,9 @@ func (settingService *SettingService) GetAgentSettings(setting *model.AgentSetti
 			return err
 		}
 
+		// 屏蔽 API Key
+		setting.ApiKey = "******"
+
 		return nil
 	})
 }
