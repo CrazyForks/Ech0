@@ -11,9 +11,10 @@ import (
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino-ext/components/model/qwen"
 	"github.com/cloudwego/eino/schema"
+	"google.golang.org/genai"
+
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	model "github.com/lin-snow/ech0/internal/model/setting"
-	"google.golang.org/genai"
 )
 
 const (
@@ -53,7 +54,6 @@ func Generate(ctx context.Context, setting model.AgentSetting, in []*schema.Mess
 			Model:   model,
 			BaseURL: baseURL,
 		})
-
 		if err != nil {
 			return "", err
 		}

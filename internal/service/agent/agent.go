@@ -6,11 +6,11 @@ import (
 	"fmt"
 
 	"github.com/cloudwego/eino/schema"
-	"github.com/lin-snow/ech0/internal/agent"
-	model "github.com/lin-snow/ech0/internal/model/setting"
 
+	"github.com/lin-snow/ech0/internal/agent"
 	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
+	model "github.com/lin-snow/ech0/internal/model/setting"
 	keyvalueRepository "github.com/lin-snow/ech0/internal/repository/keyvalue"
 	echoService "github.com/lin-snow/ech0/internal/service/echo"
 	settingService "github.com/lin-snow/ech0/internal/service/setting"

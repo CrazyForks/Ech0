@@ -98,9 +98,16 @@ func (keyvalueRepository *KeyValueRepository) UpdateKeyValue(ctx context.Context
 }
 
 // AddOrUpdateKeyValue 添加或更新键值对
-func (keyvalueRepository *KeyValueRepository) AddOrUpdateKeyValue(ctx context.Context, key string, value interface{}) error {
+func (keyvalueRepository *KeyValueRepository) AddOrUpdateKeyValue(
+	ctx context.Context,
+	key string,
+	value interface{},
+) error {
 	// 先尝试更新
-	result := keyvalueRepository.getDB(ctx).Model(&model.KeyValue{}).Where("key = ?", key).Update("value", value.(string))
+	result := keyvalueRepository.getDB(ctx).
+		Model(&model.KeyValue{}).
+		Where("key = ?", key).
+		Update("value", value.(string))
 	if result.Error != nil {
 		return result.Error
 	}
