@@ -192,6 +192,16 @@ func (agentService *AgentService) Generate(ctx context.Context, in []*schema.Mes
 		resp, genErr = cm.Generate(ctx, in)
 
 	case string(commonModel.Custom):
+		cm, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
+			APIKey:  apiKey,
+			Model:   model,
+			BaseURL: baseURL,
+		})
+		if err != nil {
+			return "", err
+		}
+
+		resp, genErr = cm.Generate(ctx, in)
 
 	default:
 		return "", errors.New(commonModel.AGENT_PROVIDER_NOT_FOUND)

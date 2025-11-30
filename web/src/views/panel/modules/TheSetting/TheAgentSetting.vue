@@ -76,6 +76,20 @@
         />
       </div>
 
+      <!-- 自定义 Base URL -->
+      <div class="flex justify-start text-[var(--text-color-next-500)] gap-2 mt-2">
+        <h2 class="font-semibold w-24 shrink-0">Base URL:</h2>
+        <span v-if="!agentEditMode" class="truncate max-w-60 inline-block align-middle">
+          {{ AgentSetting.base_url.length == 0 ? '暂无' : AgentSetting.base_url }}
+        </span>
+        <BaseInput
+          v-if="agentEditMode"
+          v-model="AgentSetting.base_url"
+          placeholder="输入自定义 Base URL"
+          class="w-full py-1!"
+        />
+      </div>
+
       <!-- Prompt -->
       <div class="flex justify-start text-[var(--text-color-next-500)] gap-2 mt-2">
         <h2 class="font-semibold w-24 shrink-0">Prompt:</h2>
@@ -88,21 +102,6 @@
           placeholder="输入自定义 Prompt"
           class="w-full"
           :rows="4"
-        />
-      </div>
-
-      <!-- 自定义 Base URL -->
-      <div class="flex justify-start text-[var(--text-color-next-500)] gap-2 mt-2">
-        <h2 class="font-semibold w-24 shrink-0">Base URL:</h2>
-        <span v-if="!agentEditMode" class="truncate max-w-60 inline-block align-middle">
-          {{ AgentSetting.base_url.length == 0 ? '暂无' : '' }}
-        </span>
-        <BaseInput
-          v-if="agentEditMode"
-          v-model="AgentSetting.base_url"
-          type="text"
-          placeholder="输入自定义 Base URL (可选)"
-          class="w-full py-1!"
         />
       </div>
 
@@ -138,8 +137,8 @@ const agentProviderOptions = ref<{ label: string; value: AgentProvider }[]>([
   { label: 'Anthropic', value: AgentProvider.ANTHROPIC },
   { label: 'Gemini', value: AgentProvider.GEMINI },
   { label: 'Qwen', value: AgentProvider.QWEN },
-  // { label: 'Ollama', value: AgentProvider.OLLAMA },
-  // { label: '自定义', value: AgentProvider.CUSTOM },
+  { label: 'Ollama', value: AgentProvider.OLLAMA },
+  { label: '自定义', value: AgentProvider.CUSTOM },
 ])
 
 const handleUpdateAgentSetting = async () => {
