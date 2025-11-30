@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	res "github.com/lin-snow/ech0/internal/handler/response"
+	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	service "github.com/lin-snow/ech0/internal/service/agent"
 )
 
@@ -20,17 +21,17 @@ func NewAgentHandler(agentService service.AgentServiceInterface) *AgentHandler {
 func (agentHandler *AgentHandler) GetRecent() gin.HandlerFunc {
 	return res.Execute(func(ctx *gin.Context) res.Response {
 		// 调用服务层获取作者近况信息
-		context, err := agentHandler.agentService.GetRecent(ctx)
+		result, err := agentHandler.agentService.GetRecent(ctx)
 		if err != nil {
 			return res.Response{
-				Msg: "获取作者近况失败",
+				Msg: "",
 				Err: err,
 			}
 		}
 
 		return res.Response{
-			Data: context,
-			Msg:  "获取作者近况成功",
+			Data: result,
+			Msg:  commonModel.AGENT_GET_RECENT_SUCCESS,
 		}
 	})
 }

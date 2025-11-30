@@ -14,6 +14,7 @@ import (
 	model "github.com/lin-snow/ech0/internal/model/setting"
 	"google.golang.org/genai"
 
+	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	echoService "github.com/lin-snow/ech0/internal/service/echo"
 	settingService "github.com/lin-snow/ech0/internal/service/setting"
@@ -39,16 +40,34 @@ func NewAgentService(
 }
 
 func (agentService *AgentService) GetRecent(ctx context.Context) (string, error) {
+	echos, err := agentService.echoService.GetEchosByPage(authModel.NO_USER_LOGINED, commonModel.PageQueryDto{
+		Page:     1,
+		PageSize: 10,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	var memos []*schema.Message
+	for _, echo := range echos.Items {
+		memos = append(memos, &schema.Message{
+			Role:    schema.Assistant,
+			Content: echo.Content,
+		})
+	}
+
 	in := []*schema.Message{
 		{
 			Role:    schema.System,
-			Content: "你是一个热心的个人助理，帮助用户管理他们的待办事项和回顾最近的活动。",
+			Content: "你是一个热心的个人助理，帮助用户回顾最近的活动。",
 		},
 		{
 			Role:    schema.User,
-			Content: "请告诉我我最近的待办事项和活动回顾。",
+			Content: "请根据我最近的活动进行总结。",
 		},
 	}
+
+	in = append(in, memos...)
 
 	output, err := agentService.Generate(ctx, in)
 	if err != nil {
