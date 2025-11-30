@@ -104,7 +104,6 @@
           :rows="4"
         />
       </div>
-
     </div>
   </PanelCard>
 </template>

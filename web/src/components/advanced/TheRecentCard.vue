@@ -1,10 +1,10 @@
 <template>
-    <div v-if="AgentSetting.enable" class="px-9 md:px-11">
+  <div v-if="AgentSetting.enable" class="px-9 md:px-11">
     <div
       class="widget rounded-md shadow-sm hover:shadow-md ring-1 ring-[var(--ring-color)] ring-inset p-4"
     >
       <h2 class="text-[var(--widget-title-color)] font-bold text-lg mb-1 flex items-center">
-        <RecentIcon class="mr-2" /> 近况总结：
+        <RecentIcon class="mr-2" /> 近况总结(AI)：
       </h2>
 
       <div v-if="!loading" class="text-[var(--text-color-next-500)] text-sm">
@@ -17,28 +17,28 @@
   </div>
 </template>
 <script setup lang="ts">
-import { fetchGetRecent } from '@/service/api';
-import { onMounted, ref } from 'vue';
-import { useSettingStore } from '@/stores/setting';
-import { storeToRefs } from 'pinia';
-import RecentIcon from '../icons/recent.vue';
+import { fetchGetRecent } from '@/service/api'
+import { onMounted, ref } from 'vue'
+import { useSettingStore } from '@/stores/setting'
+import { storeToRefs } from 'pinia'
+import RecentIcon from '../icons/recent.vue'
 
-const settingStore = useSettingStore();
-const { AgentSetting } = storeToRefs(settingStore);
+const settingStore = useSettingStore()
+const { AgentSetting } = storeToRefs(settingStore)
 
-const recent = ref<string>("");
-const loading = ref<boolean>(true);
+const recent = ref<string>('')
+const loading = ref<boolean>(true)
 
 onMounted(() => {
-    fetchGetRecent().then((res) => {
-        if (res.code === 1) {
-            recent.value = res.data;
-        }
-    }).finally(() => {
-        loading.value = false;
-    });
+  fetchGetRecent()
+    .then((res) => {
+      if (res.code === 1) {
+        recent.value = res.data
+      }
+    })
+    .finally(() => {
+      loading.value = false
+    })
 })
 </script>
-<style scoped>
-    
-</style>
+<style scoped></style>
