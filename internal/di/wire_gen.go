@@ -69,7 +69,7 @@ func BuildHandlers(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory,
 	fediverseRepositoryInterface := repository6.NewFediverseRepository(dbProvider)
 	fediverseCore := fediverse.NewFediverseCore(fediverseRepositoryInterface, keyValueRepositoryInterface, userRepositoryInterface, echoRepositoryInterface)
 	fediverseServiceInterface := service4.NewFediverseService(fediverseCore, transactionManager, fediverseRepositoryInterface, userRepositoryInterface, echoRepositoryInterface)
-	echoServiceInterface := service5.NewEchoService(transactionManager, commonServiceInterface, echoRepositoryInterface, commonRepositoryInterface, fediverseServiceInterface, ebProvider)
+	echoServiceInterface := service5.NewEchoService(transactionManager, commonServiceInterface, echoRepositoryInterface, commonRepositoryInterface, fediverseServiceInterface, keyValueRepositoryInterface, ebProvider)
 	echoHandler := handler3.NewEchoHandler(echoServiceInterface)
 	commonHandler := handler4.NewCommonHandler(commonServiceInterface)
 	settingHandler := handler5.NewSettingHandler(settingServiceInterface)
@@ -86,7 +86,7 @@ func BuildHandlers(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory,
 	monitorMonitor := monitor.NewMonitor(metricCollector)
 	dashboardServiceInterface := service9.NewDashboardService(monitorMonitor, commonServiceInterface)
 	dashboardHandler := handler10.NewDashboardHandler(dashboardServiceInterface)
-	agentServiceInterface := service10.NewAgentService(settingServiceInterface, echoServiceInterface, todoServiceInterface)
+	agentServiceInterface := service10.NewAgentService(settingServiceInterface, echoServiceInterface, todoServiceInterface, keyValueRepositoryInterface)
 	agentHandler := handler11.NewAgentHandler(agentServiceInterface)
 	handlers := NewHandlers(webHandler, userHandler, echoHandler, commonHandler, settingHandler, todoHandler, connectHandler, backupHandler, fediverseHandler, dashboardHandler, agentHandler)
 	return handlers, nil
