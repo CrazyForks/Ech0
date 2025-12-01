@@ -171,15 +171,15 @@ func (settingService *SettingService) GetCommentSetting(setting *model.CommentSe
 
 // UpdateCommentSetting 更新评论设置
 func (settingService *SettingService) UpdateCommentSetting(userid uint, newSetting *model.CommentSettingDto) error {
-	return settingService.txManager.Run(func(ctx context.Context) error {
-		user, err := settingService.commonService.CommonGetUserByUserId(userid)
-		if err != nil {
-			return err
-		}
-		if !user.IsAdmin {
-			return errors.New(commonModel.NO_PERMISSION_DENIED)
-		}
+	user, err := settingService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
 
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		// 检查评论服务提供者是否有效
 		if newSetting.Provider != string(commonModel.TWIKOO) &&
 			newSetting.Provider != string(commonModel.ARTALK) &&
@@ -248,6 +248,17 @@ func (settingService *SettingService) GetS3Setting(userid uint, setting *model.S
 			setting.SecretKey = "******"
 			setting.BucketName = "******"
 			setting.Endpoint = "******"
+		} else {
+			user, err := settingService.commonService.CommonGetUserByUserId(userid)
+			if err != nil {
+				return err
+			}
+			if !user.IsAdmin {
+				setting.AccessKey = "******"
+				setting.SecretKey = "******"
+				setting.BucketName = "******"
+				setting.Endpoint = "******"
+			}
 		}
 
 		return nil
@@ -256,14 +267,15 @@ func (settingService *SettingService) GetS3Setting(userid uint, setting *model.S
 
 // UpdateS3Setting 更新 S3 存储设置
 func (settingService *SettingService) UpdateS3Setting(userid uint, newSetting *model.S3SettingDto) error {
+	user, err := settingService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
+
 	return settingService.txManager.Run(func(ctx context.Context) error {
-		user, err := settingService.commonService.CommonGetUserByUserId(userid)
-		if err != nil {
-			return err
-		}
-		if !user.IsAdmin {
-			return errors.New(commonModel.NO_PERMISSION_DENIED)
-		}
 		// 检查endpoint是否为http(s)动态改变USE SSL
 		if strings.HasPrefix(strings.ToLower(strings.TrimSpace(newSetting.Endpoint)), "https://") {
 			newSetting.UseSSL = true
@@ -381,15 +393,15 @@ func (settingService *SettingService) GetOAuth2Setting(
 
 // UpdateOAuth2Setting 更新 OAuth2 设置
 func (settingService *SettingService) UpdateOAuth2Setting(userid uint, newSetting *model.OAuth2SettingDto) error {
-	return settingService.txManager.Run(func(ctx context.Context) error {
-		user, err := settingService.commonService.CommonGetUserByUserId(userid)
-		if err != nil {
-			return err
-		}
-		if !user.IsAdmin {
-			return errors.New(commonModel.NO_PERMISSION_DENIED)
-		}
+	user, err := settingService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
 
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		oauthSetting := &model.OAuth2Setting{
 			Enable:       newSetting.Enable,
 			Provider:     newSetting.Provider,
