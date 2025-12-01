@@ -26,9 +26,5 @@ func fixOldEchoLayoutData() error {
 
 // UpdateMigration 执行旧数据库迁移和数据修复任务
 func UpdateMigration() error {
-	var err error
-
-	err = fixOldEchoLayoutData()
-
-	return err
+	return fixOldEchoLayoutData()
 }
