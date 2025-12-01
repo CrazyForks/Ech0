@@ -1,5 +1,5 @@
 <template>
-  <div v-if="recent" class="px-9 md:px-11">
+  <div v-if="AgentSetting.enable" class="px-9 md:px-11">
     <div
       class="widget rounded-md shadow-sm hover:shadow-md ring-1 ring-[var(--ring-color)] ring-inset p-4"
     >
@@ -21,6 +21,11 @@ import { fetchGetRecent } from '@/service/api'
 import { onMounted, ref } from 'vue'
 import RecentIcon from '../icons/recent.vue'
 import TheMdPreview from './TheMdPreview.vue'
+import { useSettingStore } from '@/stores/setting'
+import { storeToRefs } from 'pinia'
+
+const settingStore = useSettingStore()
+const { AgentSetting } = storeToRefs(settingStore)
 
 const recent = ref<string>('作者最近很神秘～')
 const loading = ref<boolean>(true)
