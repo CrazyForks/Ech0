@@ -7,7 +7,7 @@
         <RecentIcon class="mr-2" /> 近况总结(AI)：
       </h2>
 
-      <div v-if="!loading" class="text-[var(--text-color-next-500)] text-sm">
+      <div v-if="!loading" class="text-[var(--text-color-next-500)] text-sm p-1">
         <TheMdPreview :content="recent" />
       </div>
       <div v-else>
@@ -37,4 +37,15 @@ onMounted(() => {
     })
 })
 </script>
-<style scoped></style>
+<style scoped>
+.md-editor-dark,
+.md-editor-modal-container[data-theme='dark'] {
+  --md-bk-color: #212121 !important;
+}
+
+:deep(#preview-only-preview) p {
+  color: var(--text-color-next-500) !important;
+  font-size: var(--text-sm-fontSize) !important;
+  line-height: var(--un-leading, var(--text-sm-lineHeight)) !important;
+}
+</style>

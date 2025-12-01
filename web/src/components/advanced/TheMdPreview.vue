@@ -1,16 +1,16 @@
 <template>
-    <MdPreview
-        :id="previewOptions.proviewId"
-        :modelValue="props.content"
-        :theme="theme"
-        :show-code-row-number="previewOptions.showCodeRowNumber"
-        :preview-theme="previewOptions.previewTheme"
-        :code-theme="previewOptions.codeTheme"
-        :code-style-reverse="previewOptions.codeStyleReverse"
-        :no-img-zoom-in="previewOptions.noImgZoomIn"
-        :code-foldable="previewOptions.codeFoldable"
-        :auto-fold-threshold="previewOptions.autoFoldThreshold"
-    />
+  <MdPreview
+    :id="previewOptions.proviewId"
+    :modelValue="props.content"
+    :theme="theme"
+    :show-code-row-number="previewOptions.showCodeRowNumber"
+    :preview-theme="previewOptions.previewTheme"
+    :code-theme="previewOptions.codeTheme"
+    :code-style-reverse="previewOptions.codeStyleReverse"
+    :no-img-zoom-in="previewOptions.noImgZoomIn"
+    :code-foldable="previewOptions.codeFoldable"
+    :auto-fold-threshold="previewOptions.autoFoldThreshold"
+  />
 </template>
 <script setup lang="ts">
 import 'md-editor-v3/lib/preview.css'
@@ -35,15 +35,3 @@ const previewOptions = {
   autoFoldThreshold: 15,
 }
 </script>
-<style scoped>
-.md-editor-dark,
-.md-editor-modal-container[data-theme='dark'] {
-  --md-bk-color: #212121 !important;
-}
-
-:deep(#preview-only-preview) p {
-    color: var(--text-color-next-500) !important;
-    font-size: var(--text-sm-fontSize) !important;
-    line-height: var(--un-leading, var(--text-sm-lineHeight)) !important;
-}
-</style>
