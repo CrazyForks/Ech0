@@ -130,7 +130,7 @@ func (agentService *AgentService) buildRecentSummary(ctx context.Context) (strin
 	in = append(in, memos...)
 
 	var setting model.AgentSetting
-	if err := agentService.settingService.GetAgentSettings(&setting); err != nil {
+	if err := agentService.settingService.GetAgentInfo(&setting); err != nil {
 		return "", errors.New(commonModel.AGENT_SETTING_NOT_FOUND)
 	}
 

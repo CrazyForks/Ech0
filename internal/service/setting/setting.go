@@ -819,8 +819,49 @@ func (settingService *SettingService) UpdateBackupScheduleSetting(
 	})
 }
 
+// GetAgentInfo 获取 Agent 信息
+func (settingService *SettingService) GetAgentInfo(setting *model.AgentSetting) error {
+	return settingService.txManager.Run(func(ctx context.Context) error {
+		agentSetting, err := settingService.keyvalueRepository.GetKeyValue(commonModel.AgentSettingKey)
+		if err != nil {
+			// 数据库中不存在数据，返回默认值
+			setting.Enable = false
+			setting.Provider = string(commonModel.OpenAI)
+			setting.Model = ""
+			setting.ApiKey = ""
+			setting.Prompt = ""
+			setting.BaseURL = ""
+
+			// 序列化为 JSON
+			settingToJSON, err := jsonUtil.JSONMarshal(setting)
+			if err != nil {
+				return err
+			}
+			if err := settingService.keyvalueRepository.AddKeyValue(ctx, commonModel.AgentSettingKey, string(settingToJSON)); err != nil {
+				return err
+			}
+			return nil
+		}
+
+		if err := jsonUtil.JSONUnmarshal([]byte(agentSetting.(string)), setting); err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 // GetAgentSettings 获取 Agent 设置
-func (settingService *SettingService) GetAgentSettings(setting *model.AgentSetting) error {
+func (settingService *SettingService) GetAgentSettings(userid uint, setting *model.AgentSetting) error {
+	// 检查用户权限
+	user, err := settingService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
+
 	return settingService.txManager.Run(func(ctx context.Context) error {
 		agentSetting, err := settingService.keyvalueRepository.GetKeyValue(commonModel.AgentSettingKey)
 		if err != nil {
