@@ -8,7 +8,7 @@
       </h2>
 
       <div v-if="!loading" class="text-[var(--text-color-next-500)] text-sm">
-        {{ recent || '作者最近很神秘～' }}
+        <TheMdPreview :content="recent" />
       </div>
       <div v-else>
         <div class="text-[var(--text-color-next-500)] text-sm">生成中...</div>
@@ -20,8 +20,9 @@
 import { fetchGetRecent } from '@/service/api'
 import { onMounted, ref } from 'vue'
 import RecentIcon from '../icons/recent.vue'
+import TheMdPreview from './TheMdPreview.vue'
 
-const recent = ref<string>('')
+const recent = ref<string>('作者最近很神秘～')
 const loading = ref<boolean>(true)
 
 onMounted(() => {
