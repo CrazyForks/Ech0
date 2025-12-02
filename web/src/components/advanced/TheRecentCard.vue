@@ -31,7 +31,8 @@ const recent = ref<string>('作者最近很神秘～')
 const loading = ref<boolean>(true)
 
 onMounted(() => {
-  fetchGetRecent()
+  if (AgentSetting.value.enable) {
+    fetchGetRecent()
     .then((res) => {
       if (res.code === 1) {
         recent.value = res.data
@@ -40,6 +41,7 @@ onMounted(() => {
     .finally(() => {
       loading.value = false
     })
+  }
 })
 </script>
 <style scoped>
