@@ -33,14 +33,14 @@ const loading = ref<boolean>(true)
 onMounted(() => {
   if (AgentSetting.value.enable) {
     fetchGetRecent()
-    .then((res) => {
-      if (res.code === 1) {
-        recent.value = res.data
-      }
-    })
-    .finally(() => {
-      loading.value = false
-    })
+      .then((res) => {
+        if (res.code === 1) {
+          recent.value = res.data
+        }
+      })
+      .finally(() => {
+        loading.value = false
+      })
   }
 })
 </script>
