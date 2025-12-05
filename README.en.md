@@ -96,7 +96,7 @@ Ech0 is a new-generation open-source self-hosted platform designed for individua
 ⚙️ **Advanced Customization**: Easily personalize styles and scripts for expressive, unique content presentation  
 💬 **Comment System**: Quick Twikoo integration for lightweight, instant, and non-intrusive interactions  
 💻 **Cross-Platform Compatibility**: Runs natively on Windows, Linux, and ARM devices like Raspberry Pi for stable deployment anywhere  
-🔗 **Ech0 Hub Integration**: Connect to the official Ech0 Hub to discover, subscribe, and share high-quality content  
+🔗 **Ech0 Hub Square**: Built-in Ech0 Hub Square for easily discovering, subscribing to, and sharing high-quality content  
 📦 **Self-Contained Binary**: Includes all required resources — no extra dependencies, no setup hassle  
 🔗 **Rich API Support**: Open APIs for seamless integration with external systems and workflows  
 🃏 **Dynamic Content Display**: Supports Twitter-like card layouts with likes and social interactions  
