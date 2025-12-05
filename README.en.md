@@ -83,6 +83,8 @@ Ech0 is a new-generation open-source self-hosted platform designed for individua
 🔑 **OAuth2 Integration** — Native support for OAuth2, simplifying third-party login and API authorization  
 🪶 **Highly Available Webhook**: Enables real-time integration and collaboration with external systems, supporting event-driven automated workflows  
 📝 **Built-in Todo Management**: Easily capture and manage daily tasks to stay organized and productive  
+🌗 **Dark Mode & Theme Extensions**: Supports adaptive system dark mode or manual switching, with future extensibility for custom color schemes  
+🤖 **Quick Agent AI Setup**: Easily configure multiple large language models for instant AI experience, no manual setup required  
 🧰 **Command-Line Powerhouse**: A built-in high-availability CLI that empowers developers and advanced users with precision control and seamless automation  
 🔑 **Quick Access Token Management**: Generate and revoke access tokens with one click for secure and efficient API calls and third-party integrations  
 📊 **Real-Time System Resource Monitoring**: High-performance WebSocket-based monitoring dashboard for instant visibility into runtime status  
