@@ -10,8 +10,8 @@ type InboxRepositoryInterface interface {
 	// 创建收件箱消息
 	PostInbox(ctx context.Context, inbox *inboxModel.Inbox) error
 
-	// 获取收件箱消息列表，支持分页
-	GetInboxList(ctx context.Context, offset, limit int) ([]*inboxModel.Inbox, error)
+	// 获取收件箱消息列表，支持分页与搜索
+	GetInboxList(ctx context.Context, offset, limit int, search string) ([]*inboxModel.Inbox, int64, error)
 
 	// 标记消息为已读
 	MarkAsRead(ctx context.Context, inboxID uint) error

@@ -49,6 +49,11 @@ const (
 	S3_CONFIG_ERROR        = "S3存储配置错误"
 )
 
+// Inbox 错误相关常量
+const (
+	INBOX_NOT_FOUND = "收件箱消息不存在"
+)
+
 // User 错误相关常量
 const (
 	USERNAME_ALREADY_EXISTS        = "用户名已存在"

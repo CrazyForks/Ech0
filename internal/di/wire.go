@@ -17,6 +17,7 @@ import (
 	dashboardHandler "github.com/lin-snow/ech0/internal/handler/dashboard"
 	echoHandler "github.com/lin-snow/ech0/internal/handler/echo"
 	fediverseHandler "github.com/lin-snow/ech0/internal/handler/fediverse"
+	inboxHandler "github.com/lin-snow/ech0/internal/handler/inbox"
 	settingHandler "github.com/lin-snow/ech0/internal/handler/setting"
 	todoHandler "github.com/lin-snow/ech0/internal/handler/todo"
 	userHandler "github.com/lin-snow/ech0/internal/handler/user"
@@ -41,6 +42,7 @@ import (
 	dashboardService "github.com/lin-snow/ech0/internal/service/dashboard"
 	echoService "github.com/lin-snow/ech0/internal/service/echo"
 	fediverseService "github.com/lin-snow/ech0/internal/service/fediverse"
+	inboxService "github.com/lin-snow/ech0/internal/service/inbox"
 	settingService "github.com/lin-snow/ech0/internal/service/setting"
 	todoService "github.com/lin-snow/ech0/internal/service/todo"
 	userService "github.com/lin-snow/ech0/internal/service/user"
@@ -65,6 +67,7 @@ func BuildHandlers(
 		WebhookSet,
 		KeyValueSet,
 		SettingSet,
+		InboxSet,
 		TodoSet,
 		ConnectSet,
 		MetricSet,
@@ -212,6 +215,8 @@ var WebhookSet = wire.NewSet(
 // InboxSet 包含了构建 InboxRepository 所需的所有 Provider
 var InboxSet = wire.NewSet(
 	inboxRepository.NewInboxRepository,
+	inboxService.NewInboxService,
+	inboxHandler.NewInboxHandler,
 )
 
 // TaskSet 包含了构建 Tasker 所需的所有 Provider

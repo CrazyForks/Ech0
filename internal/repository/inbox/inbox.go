@@ -31,13 +31,35 @@ func (inboxRepository *InboxRepository) PostInbox(ctx context.Context, inbox *in
 	return inboxRepository.getDB(ctx).Create(inbox).Error
 }
 
-// GetInboxList 获取收件箱消息列表，支持分页和倒序
-func (inboxRepository *InboxRepository) GetInboxList(ctx context.Context, offset, limit int) ([]*inboxModel.Inbox, error) {
-	var inboxes []*inboxModel.Inbox
+// GetInboxList 获取收件箱消息列表，支持分页、搜索和倒序
+func (inboxRepository *InboxRepository) GetInboxList(
+	ctx context.Context,
+	offset, limit int,
+	search string,
+) ([]*inboxModel.Inbox, int64, error) {
+	var (
+		inboxes []*inboxModel.Inbox
+		total   int64
+	)
 
 	query := inboxRepository.getDB(ctx).
-		Model(&inboxModel.Inbox{}).
-		Order("created_at DESC")
+		Model(&inboxModel.Inbox{})
+
+	if search != "" {
+		searchLike := "%" + search + "%"
+		query = query.Where(
+			"content LIKE ? OR source LIKE ? OR type LIKE ?",
+			searchLike,
+			searchLike,
+			searchLike,
+		)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	query = query.Order("created_at DESC")
 
 	if offset > 0 {
 		query = query.Offset(offset)
@@ -47,10 +69,10 @@ func (inboxRepository *InboxRepository) GetInboxList(ctx context.Context, offset
 	}
 
 	if err := query.Find(&inboxes).Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return inboxes, nil
+	return inboxes, total, nil
 }
 
 // MarkAsRead 标记消息为已读
