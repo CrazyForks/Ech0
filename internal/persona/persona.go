@@ -2,6 +2,7 @@ package persona
 
 import (
 	"math/rand"
+	"strings"
 )
 
 const (
@@ -40,19 +41,19 @@ type Persona struct {
 }
 
 func (p *Persona) UpdateStyle(style []Feature) {
-
+	p.Style = style
 }
 
 func (p *Persona) UpdateMood(mood []Feature) {
-
+	p.Mood = mood
 }
 
 func (p *Persona) UpdateTopics(topics []Feature) {
-
+	p.Topics = topics
 }
 
 func (p *Persona) UpdateExpression(expression []Feature) {
-
+	p.Expression = expression
 }
 
 func (p *Persona) UpdateDescription(description string) {
@@ -61,8 +62,31 @@ func (p *Persona) UpdateDescription(description string) {
 
 // WhatDimensionToUpdate 随机选择一个维度进行更新
 func (p *Persona) WhatDimensionToUpdate() Dimension {
-	dimensions := []Dimension{StyleDim, MoodDim, TopicsDim, ExpressionDim}
-	return dimensions[rand.Intn(len(dimensions))]
+	// 动态根据 feature 数量做反向加权，越少越容易被选中
+	weights := map[Dimension]float64{
+		StyleDim:      1.0 / float64(len(p.Style)+1),
+		MoodDim:       1.0 / float64(len(p.Mood)+1),
+		TopicsDim:     1.0 / float64(len(p.Topics)+1),
+		ExpressionDim: 1.0 / float64(len(p.Expression)+1),
+	}
+
+	// 求总和
+	var total float64
+	for _, w := range weights {
+		total += w
+	}
+
+	// 做一个 0~total 的 roulette wheel（轮盘赌随机）
+	r := rand.Float64() * total
+
+	for dim, w := range weights {
+		if r < w {
+			return dim
+		}
+		r -= w
+	}
+
+	return StyleDim // 理论不会走到这里
 }
 
 // GetDimensionFeatures 获取指定维度的特征
@@ -83,6 +107,8 @@ func (p *Persona) GetDimensionFeatures(dim Dimension) []Feature {
 
 // UpdateDimension 根据维度更新对应的特征
 func (p *Persona) UpdateDimension(dim Dimension, features []Feature) {
+	features = sanitizeFeatures(features)
+
 	switch dim {
 	case StyleDim:
 		p.UpdateStyle(features)
@@ -93,4 +119,28 @@ func (p *Persona) UpdateDimension(dim Dimension, features []Feature) {
 	case ExpressionDim:
 		p.UpdateExpression(features)
 	}
+}
+
+// sanitizeFeatures 清理和规范化特征列表
+func sanitizeFeatures(features []Feature) []Feature {
+	clean := make([]Feature, 0, len(features))
+
+	for _, f := range features {
+		// name 必须存在且非空
+		if strings.TrimSpace(f.Name) == "" {
+			continue
+		}
+
+		// weight 修正到 0~1
+		if f.Weight < 0 {
+			f.Weight = 0
+		}
+		if f.Weight > 1 {
+			f.Weight = 1
+		}
+
+		clean = append(clean, f)
+	}
+
+	return clean
 }

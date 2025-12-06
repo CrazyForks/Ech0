@@ -99,8 +99,8 @@ const (
 
 const (
 	// Inbox 类型
-	Echo         InboxType = "echo"
-	Notification InboxType = "notification"
+	EchoInboxType         InboxType = "echo"
+	NotificationInboxType InboxType = "notification"
 
 	// Inbox 来源
 	SystemSource InboxSource = "system"
