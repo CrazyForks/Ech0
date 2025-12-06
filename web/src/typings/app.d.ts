@@ -481,6 +481,17 @@ declare namespace App {
         meta?: string
         created_at: string
       }
+
+      type InboxListResult = {
+        items: Inbox[]
+        total: number
+      }
+
+      type InboxListParams = {
+        page: number
+        pageSize: number
+        search?: string
+      }
     }
   }
 }
