@@ -108,6 +108,7 @@ func BuildEventRegistrar(
 	wire.Build(
 		EchoSet,
 		UserSet,
+		TodoSet,
 		CacheSet,
 		TransactionManagerSet,
 		KeyValueSet,
@@ -235,6 +236,7 @@ var EventSet = wire.NewSet(
 	event.NewWebhookDispatcher,
 	event.NewBackupScheduler,
 	event.NewDeadLetterResolver,
+	event.NewAgentProcessor,
 	event.NewEventHandlers,
 	event.NewEventRegistry,
 )

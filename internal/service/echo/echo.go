@@ -7,7 +7,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/lin-snow/ech0/internal/agent"
 	"github.com/lin-snow/ech0/internal/event"
 	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
@@ -136,7 +135,7 @@ func (echoService *EchoService) PostEcho(userid uint, newEcho *model.Echo) error
 		return fetchErr
 	}
 	if savedEcho != nil {
-		// 推送事件(Webhook, Fediverse等)
+		// 推送事件(Webhook, Fediverse, Agent等)
 		if pubErr := echoService.eventBus.Publish(
 			context.Background(),
 			event.NewEvent(
@@ -151,9 +150,6 @@ func (echoService *EchoService) PostEcho(userid uint, newEcho *model.Echo) error
 			logUtil.GetLogger().Error(pubErr.Error())
 		}
 	}
-
-	// 删除 AGENT_GEN_RECENT 缓存
-	echoService.kvRepository.DeleteKeyValue(context.Background(), string(agent.GEN_RECENT))
 
 	return nil
 }
@@ -256,9 +252,6 @@ func (echoService *EchoService) DeleteEchoById(userid, id uint) error {
 		// 推送失败不影响删除
 		logUtil.GetLogger().Error(pubErr.Error())
 	}
-
-	// 删除 AGENT_GEN_RECENT 缓存
-	echoService.kvRepository.DeleteKeyValue(context.Background(), string(agent.GEN_RECENT))
 
 	return nil
 }
@@ -382,9 +375,6 @@ func (echoService *EchoService) UpdateEcho(userid uint, echo *model.Echo) error 
 		// 推送失败不影响更新
 		logUtil.GetLogger().Error(pubErr.Error())
 	}
-
-	// 删除 AGENT_GEN_RECENT 缓存
-	echoService.kvRepository.DeleteKeyValue(context.Background(), string(agent.GEN_RECENT))
 
 	return nil
 }
