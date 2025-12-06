@@ -300,6 +300,7 @@ func (ap *AgentProcessor) mayPostEchoToInbox(setting *settingModel.AgentSetting)
 - Echo 可以涉及不同兴趣主题，不要总是重复相同话题。
 - 可以描述日常生活、思考、体验、趣闻，展现人格的丰富性。
 - 内容应体现独立性：独立性高的人更倾向表达独立观点，低独立性的人可能模仿或借鉴外界语气。
+- 采用随机的表达方式，不要总是使用同一种句式或结构。
 
 %s
 
@@ -331,7 +332,7 @@ func (ap *AgentProcessor) mayPostEchoToInbox(setting *settingModel.AgentSetting)
 		},
 	}
 
-	out, err := agent.Generate(context.Background(), *setting, in, false, float32(p.Independence+0.2))
+	out, err := agent.Generate(context.Background(), *setting, in, false, float32(p.Independence+0.35))
 	if err != nil {
 		return errors.New(err.Error() + " | during echo generation:" + out)
 	}
