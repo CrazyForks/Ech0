@@ -881,6 +881,7 @@ func (settingService *SettingService) GetAgentSettings(userid uint, setting *mod
 			if err := settingService.keyvalueRepository.AddKeyValue(ctx, commonModel.AgentSettingKey, string(settingToJSON)); err != nil {
 				return err
 			}
+
 			return nil
 		}
 

@@ -21,7 +21,7 @@ const (
 	GEN_RECENT = "gen_recent"
 )
 
-func Generate(ctx context.Context, setting model.AgentSetting, in []*schema.Message) (string, error) {
+func Generate(ctx context.Context, setting model.AgentSetting, in []*schema.Message, usePrompt bool) (string, error) {
 	if !setting.Enable {
 		return "", errors.New(commonModel.AGENT_NOT_ENABLED)
 	}
@@ -43,7 +43,7 @@ func Generate(ctx context.Context, setting model.AgentSetting, in []*schema.Mess
 	apiKey := setting.ApiKey
 	model := setting.Model
 	prompt := setting.Prompt
-	if prompt != "" {
+	if prompt != "" && usePrompt {
 		// 在对话开头添加系统提示
 		in = append(in, &schema.Message{
 			Role:    schema.User,

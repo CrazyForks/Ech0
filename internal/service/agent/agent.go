@@ -131,7 +131,7 @@ func (agentService *AgentService) buildRecentSummary(ctx context.Context) (strin
 		return "", errors.New(commonModel.AGENT_SETTING_NOT_FOUND)
 	}
 
-	output, err := agent.Generate(ctx, setting, in)
+	output, err := agent.Generate(ctx, setting, in, true)
 	if err != nil {
 		return "", err
 	}

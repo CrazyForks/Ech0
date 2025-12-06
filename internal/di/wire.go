@@ -27,6 +27,7 @@ import (
 	connectRepository "github.com/lin-snow/ech0/internal/repository/connect"
 	echoRepository "github.com/lin-snow/ech0/internal/repository/echo"
 	fediverseRepository "github.com/lin-snow/ech0/internal/repository/fediverse"
+	inboxRepository "github.com/lin-snow/ech0/internal/repository/inbox"
 	keyvalueRepository "github.com/lin-snow/ech0/internal/repository/keyvalue"
 	queueRepository "github.com/lin-snow/ech0/internal/repository/queue"
 	settingRepository "github.com/lin-snow/ech0/internal/repository/setting"
@@ -109,6 +110,7 @@ func BuildEventRegistrar(
 		EchoSet,
 		UserSet,
 		TodoSet,
+		InboxSet,
 		CacheSet,
 		TransactionManagerSet,
 		KeyValueSet,
@@ -205,6 +207,11 @@ var AgentSet = wire.NewSet(
 // WebhookSet 包含了构建 WebhookDispatcher 所需的所有 Provider
 var WebhookSet = wire.NewSet(
 	webhookRepository.NewWebhookRepository,
+)
+
+// InboxSet 包含了构建 InboxRepository 所需的所有 Provider
+var InboxSet = wire.NewSet(
+	inboxRepository.NewInboxRepository,
 )
 
 // TaskSet 包含了构建 Tasker 所需的所有 Provider

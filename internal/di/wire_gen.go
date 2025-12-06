@@ -28,6 +28,7 @@ import (
 	repository8 "github.com/lin-snow/ech0/internal/repository/connect"
 	repository3 "github.com/lin-snow/ech0/internal/repository/echo"
 	repository6 "github.com/lin-snow/ech0/internal/repository/fediverse"
+	repository10 "github.com/lin-snow/ech0/internal/repository/inbox"
 	"github.com/lin-snow/ech0/internal/repository/keyvalue"
 	repository9 "github.com/lin-snow/ech0/internal/repository/queue"
 	repository4 "github.com/lin-snow/ech0/internal/repository/setting"
@@ -122,7 +123,8 @@ func BuildEventRegistrar(dbProvider func() *gorm.DB, ebProvider func() event.IEv
 	deadLetterResolver := event.NewDeadLetterResolver(queueRepositoryInterface, webhookDispatcher, fediverseAgent)
 	backupScheduler := event.NewBackupScheduler()
 	todoRepositoryInterface := repository7.NewTodoRepository(dbProvider, iCache)
-	agentProcessor := event.NewAgentProcessor(echoRepositoryInterface, todoRepositoryInterface, userRepositoryInterface, keyValueRepositoryInterface)
+	inboxRepositoryInterface := repository10.NewInboxRepository(dbProvider)
+	agentProcessor := event.NewAgentProcessor(echoRepositoryInterface, todoRepositoryInterface, userRepositoryInterface, keyValueRepositoryInterface, inboxRepositoryInterface)
 	eventHandlers := event.NewEventHandlers(webhookDispatcher, deadLetterResolver, fediverseAgent, backupScheduler, agentProcessor)
 	eventRegistrar := event.NewEventRegistry(ebProvider, eventHandlers)
 	return eventRegistrar, nil
@@ -175,6 +177,9 @@ var AgentSet = wire.NewSet(service10.NewAgentService, handler11.NewAgentHandler)
 
 // WebhookSet 包含了构建 WebhookDispatcher 所需的所有 Provider
 var WebhookSet = wire.NewSet(repository5.NewWebhookRepository)
+
+// InboxSet 包含了构建 InboxRepository 所需的所有 Provider
+var InboxSet = wire.NewSet(repository10.NewInboxRepository)
 
 // TaskSet 包含了构建 Tasker 所需的所有 Provider
 var TaskSet = wire.NewSet(task.NewTasker)
