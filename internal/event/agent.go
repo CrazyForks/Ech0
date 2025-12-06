@@ -33,6 +33,12 @@ func NewAgentProcessor(
 
 func (ap *AgentProcessor) Handle(ctx context.Context, e *Event) error {
 	// 清理生成内容的缓存
+	ap.clearCache()
+
+	return nil
+}
+
+func (ap *AgentProcessor) clearCache() error {
 	// 删除 AGENT_GEN_RECENT 缓存
 	ap.keyvalueRepo.DeleteKeyValue(context.Background(), string(agent.GEN_RECENT))
 
