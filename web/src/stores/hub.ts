@@ -151,14 +151,14 @@ export const useHubStore = defineStore('hubStore', () => {
     }
 
     // 处理结果
-    if (hubinfoList.value.length === 0) {
+    if (hubList.value.length === 0) {
       theToast.info('当前Hub暂无可连接的实例。')
       isPreparing.value = false
       return
     }
 
     isPreparing.value = false
-    theToast.success(`成功连接 ${hubinfoList.value.length} 个实例，开始加载 Echos`)
+    theToast.success(`成功连接 ${hubList.value.length} 个实例，开始加载 Echos`)
   }
 
   // 3. 根据 hubList 获取 list 中每个 item 的 echo
