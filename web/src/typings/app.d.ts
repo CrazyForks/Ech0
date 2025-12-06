@@ -470,5 +470,17 @@ declare namespace App {
         logo: string
       }
     }
+
+    namespace Inbox {
+      type Inbox = {
+        id: number
+        source: string
+        content: string
+        type: string
+        read: boolean
+        meta?: string
+        created_at: string
+      }
+    }
   }
 }
