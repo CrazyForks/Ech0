@@ -21,7 +21,13 @@ const (
 	GEN_RECENT = "gen_recent"
 )
 
-func Generate(ctx context.Context, setting model.AgentSetting, in []*schema.Message, usePrompt bool, temperature ...float32) (string, error) {
+func Generate(
+	ctx context.Context,
+	setting model.AgentSetting,
+	in []*schema.Message,
+	usePrompt bool,
+	temperature ...float32,
+) (string, error) {
 	if !setting.Enable {
 		return "", errors.New(commonModel.AGENT_NOT_ENABLED)
 	}

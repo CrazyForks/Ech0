@@ -7,7 +7,10 @@ import (
 
 type InboxServiceInterface interface {
 	// GetInboxList 获取收件箱消息列表
-	GetInboxList(userid uint, pageQueryDto commonModel.PageQueryDto) (commonModel.PageQueryResult[[]*inboxModel.Inbox], error)
+	GetInboxList(
+		userid uint,
+		pageQueryDto commonModel.PageQueryDto,
+	) (commonModel.PageQueryResult[[]*inboxModel.Inbox], error)
 
 	// GetUnreadInbox 获取所有未读消息
 	GetUnreadInbox(userid uint) ([]*inboxModel.Inbox, error)

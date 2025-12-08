@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 
+	"gorm.io/gorm"
+
 	inboxModel "github.com/lin-snow/ech0/internal/model/inbox"
 	"github.com/lin-snow/ech0/internal/transaction"
-	"gorm.io/gorm"
 )
 
 type InboxRepository struct {

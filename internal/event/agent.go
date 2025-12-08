@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/eino/schema"
+
 	"github.com/lin-snow/ech0/internal/agent"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	echoModel "github.com/lin-snow/ech0/internal/model/echo"
@@ -255,7 +256,7 @@ func (ap *AgentProcessor) mayPostEchoToInbox(setting *settingModel.AgentSetting)
 	}
 
 	// 随机化话题偏好特征
-	var topicPool = []string{
+	topicPool := []string{
 		"科技", "生活", "哲学", "编程", "艺术", "电影", "旅行",
 		"音乐", "心理学", "历史", "美食", "运动", "游戏", "文学",
 	}

@@ -27,17 +27,17 @@ type Feature struct {
 
 // Persona 平行人格描述
 type Persona struct {
-	ID           uint      `gorm:"primaryKey" json:"id"`                         // 人格ID
-	Name         string    `gorm:"type:varchar(50);unique;not null" json:"name"` // 平行人格名称
-	Style        []Feature `gorm:"type:text" json:"style"`                       // JSON格式存储风格维度权重
-	Mood         []Feature `gorm:"type:text" json:"mood"`                        // JSON格式存储情绪维度权重
-	Topics       []Feature `gorm:"type:text" json:"topics"`                      // JSON格式存储兴趣主题权重
-	Expression   []Feature `gorm:"type:text" json:"expression"`                  // JSON格式存储表达偏好权重
-	Description  string    `gorm:"type:text" json:"description"`                 // 人格描述
-	Independence float64   `gorm:"type:float" json:"independence"`               // 独立性权重 (0~1)
-	LastActive   int64     `json:"last_active"`                                  // 上次生成内容时间
-	CreatedAt    int64     `json:"created_at"`
-	UpdatedAt    int64     `json:"updated_at"`
+	ID           uint      `gorm:"primaryKey"                       json:"id"`           // 人格ID
+	Name         string    `gorm:"type:varchar(50);unique;not null" json:"name"`         // 平行人格名称
+	Style        []Feature `gorm:"type:text"                        json:"style"`        // JSON格式存储风格维度权重
+	Mood         []Feature `gorm:"type:text"                        json:"mood"`         // JSON格式存储情绪维度权重
+	Topics       []Feature `gorm:"type:text"                        json:"topics"`       // JSON格式存储兴趣主题权重
+	Expression   []Feature `gorm:"type:text"                        json:"expression"`   // JSON格式存储表达偏好权重
+	Description  string    `gorm:"type:text"                        json:"description"`  // 人格描述
+	Independence float64   `gorm:"type:float"                       json:"independence"` // 独立性权重 (0~1)
+	LastActive   int64     `                                        json:"last_active"`  // 上次生成内容时间
+	CreatedAt    int64     `                                        json:"created_at"`
+	UpdatedAt    int64     `                                        json:"updated_at"`
 }
 
 func (p *Persona) UpdateStyle(style []Feature) {
