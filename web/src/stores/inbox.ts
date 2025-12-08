@@ -149,10 +149,7 @@ export const useInboxStore = defineStore('inboxStore', () => {
     initialized.value = true
 
     watch(
-      [
-        () => userStore.isLogin,
-        () => isAdmin.value,
-      ],
+      [() => userStore.isLogin, () => isAdmin.value],
       ([isLogin, admin]) => {
         if (isLogin && admin) {
           void refresh()
