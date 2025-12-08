@@ -365,11 +365,8 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 
 	// 安全地返回结果
 	mu.Lock()
-	result := make([]model.Connect, len(connectList))
-	copy(result, connectList)
-	mu.Unlock()
-
-	return result, nil
+	defer mu.Unlock()
+	return connectList, nil
 }
 
 // GetConnects 获取当前实例添加的所有连接
