@@ -918,7 +918,7 @@ func exchangeCustomCodeForToken(setting *settingModel.OAuth2Setting, code string
 		}
 	}
 
-	return "", errors.New("Custom token 响应缺少 access_token")
+	return "", errors.New("custom token 响应缺少 access_token")
 }
 
 // fetchCustomUserInfo 获取自定义 OAuth2 用户信息
@@ -951,7 +951,7 @@ func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken string
 		}
 	}
 
-	return "", errors.New("Custom 用户信息缺少唯一标识字段 (id/sub/user_id/uid)")
+	return "", errors.New("custom 用户信息缺少唯一标识字段 (id/sub/user_id/uid)")
 }
 
 // GetOAuthInfo 获取 OAuth2 信息

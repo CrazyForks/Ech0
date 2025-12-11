@@ -83,7 +83,7 @@ const (
 // Setting 错误相关常量
 const (
 	NO_SUCH_COMMENT_PROVIDER            = "无效的评论服务提供者"
-	WEBHOOK_NAME_OR_URL_CANNOT_BE_EMPTY = "Webhook 名称或 URL 不能为空"
+	WEBHOOK_NAME_OR_URL_CANNOT_BE_EMPTY = "未填写 Webhook 名称或 URL"
 	INVALID_CRON_EXPRESSION             = "无效的 Cron 表达式"
 )
 
@@ -104,9 +104,9 @@ const (
 
 // Agent 错误相关常量
 const (
-	AGENT_NOT_ENABLED        = "Agent 功能未启用"
+	AGENT_NOT_ENABLED        = "未启用 Agent "
 	AGENT_PROVIDER_NOT_FOUND = "未找到对应的 Agent 提供商"
-	AGENT_API_KEY_MISSING    = "Agent API Key 不能为空"
-	AGENT_MODEL_MISSING      = "Agent 模型名称不能为空"
+	AGENT_API_KEY_MISSING    = "未配置 Agent API Key 或 API Key 为空"
+	AGENT_MODEL_MISSING      = "未配置 Agent 模型名称或模型名称不能为空"
 	AGENT_SETTING_NOT_FOUND  = "未找到 Agent 设置"
 )

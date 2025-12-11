@@ -225,7 +225,9 @@ func addFileToZip(zipWriter *zip.Writer, filename, archiveName string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	info, err := file.Stat()
 	if err != nil {
@@ -254,7 +256,9 @@ func UnzipFile(src, dest string) error {
 	if err != nil {
 		return fmt.Errorf("打开 ZIP 文件失败: %w", err)
 	}
-	defer reader.Close()
+	defer func() {
+		_ = reader.Close()
+	}()
 
 	// 确保目标目录存在
 	if err := os.MkdirAll(dest, 0o755); err != nil {
@@ -293,13 +297,17 @@ func extractFile(file *zip.File, destDir string) error {
 	if err != nil {
 		return err
 	}
-	defer fileReader.Close()
+	defer func() {
+		_ = fileReader.Close()
+	}()
 
 	targetFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.FileInfo().Mode())
 	if err != nil {
 		return err
 	}
-	defer targetFile.Close()
+	defer func() {
+		_ = targetFile.Close()
+	}()
 
 	_, err = io.Copy(targetFile, fileReader)
 	return err
@@ -420,7 +428,9 @@ func copyFile(src, dest string, perm os.FileMode) error {
 	if err != nil {
 		return fmt.Errorf("打开源文件 %s 失败: %w", src, err)
 	}
-	defer in.Close()
+	defer func() {
+		_ = in.Close()
+	}()
 
 	out, err := os.OpenFile(dest, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, perm)
 	if err != nil {
