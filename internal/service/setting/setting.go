@@ -573,7 +573,7 @@ func (settingService *SettingService) ListAccessTokens(userid uint) ([]model.Acc
 			validTokens = append(validTokens, token)
 		} else {
 			// 删除过期 token
-			settingService.txManager.Run(func(ctx context.Context) error {
+			_ = settingService.txManager.Run(func(ctx context.Context) error {
 				return settingService.settingRepository.DeleteAccessTokenByID(ctx, uint(token.ID))
 			})
 		}

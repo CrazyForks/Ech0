@@ -32,8 +32,10 @@ import (
 	fileUtil "github.com/lin-snow/ech0/internal/util/file"
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
 	jsonUtil "github.com/lin-snow/ech0/internal/util/json"
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
 	mdUtil "github.com/lin-snow/ech0/internal/util/md"
 	storageUtil "github.com/lin-snow/ech0/internal/util/storage"
+	"go.uber.org/zap"
 )
 
 type CommonService struct {
@@ -576,9 +578,11 @@ func (commonService *CommonService) GetS3PresignURL(
 		CreatedAt:      now,
 		LastAccessedAt: now,
 	}
-	commonService.txManager.Run(func(ctx context.Context) error {
+	if err := commonService.txManager.Run(func(ctx context.Context) error {
 		return commonService.commonRepository.SaveTempFile(ctx, tempFile)
-	})
+	}); err != nil {
+		logUtil.GetLogger().Error("Failed to save temp file", zap.String("error", err.Error()))
+	}
 
 	return result, nil
 }
@@ -702,7 +706,7 @@ func (commonService *CommonService) CleanupTempFiles() error {
 			}
 
 			// 从数据库中删除记录(开启事务)
-			commonService.txManager.Run(func(ctx context.Context) error {
+			_ = commonService.txManager.Run(func(ctx context.Context) error {
 				return commonService.commonRepository.DeleteTempFilePermanently(ctx, file.ID)
 			})
 		}

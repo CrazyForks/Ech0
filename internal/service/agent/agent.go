@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/cloudwego/eino/schema"
+	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
 
 	"github.com/lin-snow/ech0/internal/agent"
@@ -16,6 +17,7 @@ import (
 	echoService "github.com/lin-snow/ech0/internal/service/echo"
 	settingService "github.com/lin-snow/ech0/internal/service/setting"
 	todoService "github.com/lin-snow/ech0/internal/service/todo"
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
 )
 
 type AgentService struct {
@@ -57,7 +59,10 @@ func (agentService *AgentService) GetRecent(ctx context.Context) (string, error)
 			return "", err
 		}
 
-		agentService.kvRepository.AddOrUpdateKeyValue(ctx, cacheKey, output)
+		if err := agentService.kvRepository.AddOrUpdateKeyValue(ctx, cacheKey, output); err != nil {
+			logUtil.GetLogger().Error("Failed to add or update key value", zap.String("error", err.Error()))
+		}
+
 		return output, nil
 	})
 	if err != nil {
