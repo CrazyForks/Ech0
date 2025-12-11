@@ -52,7 +52,9 @@ func (ap *AgentProcessor) Handle(ctx context.Context, e *Event) error {
 	// 获取 Agent 设置
 	var agentSetting settingModel.AgentSetting
 	if agentSettingStr, err := ap.keyvalueRepo.GetKeyValue(commonModel.AgentSettingKey); err == nil {
-		json.Unmarshal([]byte(agentSettingStr.(string)), &agentSetting)
+		if err := json.Unmarshal([]byte(agentSettingStr.(string)), &agentSetting); err != nil {
+			return err
+		}
 	}
 
 	// 清理生成内容的缓存
@@ -92,7 +94,9 @@ func (ap *AgentProcessor) updatePersona(setting *settingModel.AgentSetting, e *E
 	// 取出当前人格
 	var p persona.Persona
 	if personaStr, err := ap.keyvalueRepo.GetKeyValue(persona.PersonaKey); err == nil {
-		json.Unmarshal([]byte(personaStr.(string)), &p)
+		if err := json.Unmarshal([]byte(personaStr.(string)), &p); err != nil {
+			return err
+		}
 	} else {
 		// 如果没有找到对应的人格，初始化一个默认人格
 		now := time.Now().Unix()
@@ -214,7 +218,9 @@ func (ap *AgentProcessor) mayPostEchoToInbox(setting *settingModel.AgentSetting)
 	// 获取人格
 	var p persona.Persona
 	if personaStr, err := ap.keyvalueRepo.GetKeyValue(persona.PersonaKey); err == nil {
-		json.Unmarshal([]byte(personaStr.(string)), &p)
+		if err := json.Unmarshal([]byte(personaStr.(string)), &p); err != nil {
+			return err
+		}
 	}
 
 	// 如果人格特征信息不足，则不发表 Echo

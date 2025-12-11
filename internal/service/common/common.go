@@ -96,7 +96,7 @@ func (commonService *CommonService) UploadImage(userId uint, file *multipart.Fil
 
 	// 触发图片上传事件
 	user.Password = "" // 清除密码字段，避免泄露
-	commonService.eventBus.Publish(context.Background(), event.NewEvent(
+	if err := commonService.eventBus.Publish(context.Background(), event.NewEvent(
 		event.EventTypeResourceUploaded,
 		event.EventPayload{
 			event.EventPayloadUser: user,
@@ -105,7 +105,9 @@ func (commonService *CommonService) UploadImage(userId uint, file *multipart.Fil
 			event.EventPayloadSize: file.Size,
 			event.EventPayloadType: commonModel.ImageType,
 		},
-	))
+	)); err != nil {
+		logUtil.GetLogger().Error("Failed to publish resource uploaded event", zap.String("error", err.Error()))
+	}
 
 	return imageUrl, nil
 }

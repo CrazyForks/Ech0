@@ -127,8 +127,12 @@ func (s *Server) Start() {
 	// log.Println("🤖 任务器已启动")
 
 	// 注册事件
-	go s.eventRegistrar.Register()
-	// log.Println("🔮 事件注册器已启动")
+	if err := s.eventRegistrar.Register(); err != nil {
+		errUtil.HandlePanicError(&commonModel.ServerError{
+			Msg: commonModel.INIT_EVENT_REGISTRAR_PANIC,
+			Err: err,
+		})
+	}
 }
 
 // Stop 优雅停止服务器

@@ -33,23 +33,38 @@ func NewEventRegistry(ebp func() IEventBus, eh *EventHandlers) *EventRegistrar {
 
 // Register 注册事件处理函数
 func (er *EventRegistrar) Register() error {
+	var err error
 	// 订阅死信事件
-	er.eb.Subscribe(er.eh.dlr.Handle, EventTypeDeadLetterRetried)   // 订阅死信事件，交给 DeadLetterResolver 处理
-	er.eb.Subscribe(er.eh.fa.Handle, EventTypeEchoCreated)          // 订阅 EchoCreated 事件，交给 FediverseAgent 处理
-	er.eb.Subscribe(er.eh.bs.Handle, EventTypeUpdateBackupSchedule) // 订阅 UpdateBackupSchedule 事件，交给 BackupScheduler 处理
+	err = er.eb.Subscribe(er.eh.dlr.Handle, EventTypeDeadLetterRetried) // 订阅死信事件，交给 DeadLetterResolver 处理
+	if err != nil {
+		return err
+	}
+	err = er.eb.Subscribe(er.eh.fa.Handle, EventTypeEchoCreated) // 订阅 EchoCreated 事件，交给 FediverseAgent 处理
+	if err != nil {
+		return err
+	}
+	err = er.eb.Subscribe(er.eh.bs.Handle, EventTypeUpdateBackupSchedule) // 订阅 UpdateBackupSchedule 事件，交给 BackupScheduler 处理
+	if err != nil {
+		return err
+	}
 
 	// 订阅事件组
-	er.eb.Subscribes(
+	err = er.eb.Subscribes(
 		er.eh.ap.Handle,
 		EventTypeEchoCreated,
 		EventTypeUserDeleted,
 		EventTypeEchoUpdated,
 	) // 订阅 Echo 事件组，交给 AgentProcessor 处理
-
+	if err != nil {
+		return err
+	}
 	// 订阅所有事件，交给 WebhookDispatcher 处理
-	er.eb.SubscribeAll(er.eh.wbd.Handle, EventTypeDeadLetterRetried) // 订阅所有事件，交给 WebhookDispatcher 处理,但是排除死信事件
+	err = er.eb.SubscribeAll(er.eh.wbd.Handle, EventTypeDeadLetterRetried) // 订阅所有事件，交给 WebhookDispatcher 处理,但是排除死信事件
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return err
 }
 
 // Wait 等待所有事件处理完成
