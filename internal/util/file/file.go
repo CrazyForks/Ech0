@@ -6,9 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
-	"time"
 
 	echoModel "github.com/lin-snow/ech0/internal/model/echo"
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
@@ -219,37 +217,6 @@ func shouldIncludeFile(info os.FileInfo, options ZipOptions) bool {
 //	return nil
 //}
 
-// addFileToZip 将单个文件添加到 ZIP
-func addFileToZip(zipWriter *zip.Writer, filename, archiveName string) error {
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = file.Close()
-	}()
-
-	info, err := file.Stat()
-	if err != nil {
-		return err
-	}
-
-	header := &zip.FileHeader{
-		Name:     filepath.ToSlash(archiveName),
-		Method:   zip.Deflate,
-		Modified: info.ModTime(),
-	}
-	header.SetMode(info.Mode())
-
-	writer, err := zipWriter.CreateHeader(header)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(writer, file)
-	return err
-}
-
 // UnzipFile 解压 ZIP 文件到指定目录
 func UnzipFile(src, dest string) error {
 	reader, err := zip.OpenReader(src)
@@ -445,35 +412,6 @@ func copyFile(src, dest string, perm os.FileMode) error {
 	}
 
 	return nil
-}
-
-func removeAllWithRetry(path string, retries int, delay time.Duration) error {
-	for attempt := 0; attempt <= retries; attempt++ {
-		if err := os.RemoveAll(path); err != nil {
-			if !shouldRetrySharingViolation(err) || attempt == retries {
-				return err
-			}
-			time.Sleep(delay)
-			continue
-		}
-		return nil
-	}
-	return nil
-}
-
-func shouldRetrySharingViolation(err error) bool {
-	if runtime.GOOS != "windows" {
-		return false
-	}
-	if pathErr, ok := err.(*os.PathError); ok {
-		if pathErr.Err != nil && strings.Contains(strings.ToLower(pathErr.Err.Error()), "used by another process") {
-			return true
-		}
-	}
-	if err != nil && strings.Contains(strings.ToLower(err.Error()), "used by another process") {
-		return true
-	}
-	return false
 }
 
 // cleanBackupDir 清理备份目录

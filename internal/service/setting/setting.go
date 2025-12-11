@@ -471,11 +471,9 @@ func (settingService *SettingService) DeleteWebhook(userid, id uint) error {
 		return errors.New(commonModel.NO_PERMISSION_DENIED)
 	}
 
-	settingService.txManager.Run(func(ctx context.Context) error {
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		return settingService.webhookRepository.DeleteWebhookByID(ctx, id)
 	})
-
-	return nil
 }
 
 // UpdateWebhook 更新 Webhook
@@ -506,15 +504,13 @@ func (settingService *SettingService) UpdateWebhook(userid, id uint, newWebhook 
 		IsActive: newWebhook.IsActive,
 	}
 
-	settingService.txManager.Run(func(ctx context.Context) error {
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		// 先删除再创建，避免部分字段无法更新的问题
 		if err := settingService.webhookRepository.DeleteWebhookByID(ctx, webhook.ID); err != nil {
 			return err
 		}
 		return settingService.webhookRepository.CreateWebhook(ctx, webhook)
 	})
-
-	return nil
 }
 
 // CreateWebhook 创建 Webhook
@@ -544,11 +540,9 @@ func (settingService *SettingService) CreateWebhook(userid uint, newWebhook *mod
 		IsActive: newWebhook.IsActive,
 	}
 
-	settingService.txManager.Run(func(ctx context.Context) error {
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		return settingService.webhookRepository.CreateWebhook(ctx, webhook)
 	})
-
-	return nil
 }
 
 // ListAccessTokens 列出访问令牌

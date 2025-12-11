@@ -93,6 +93,12 @@ func (s *Server) Init() {
 		cacheFactory,
 		transactionManagerFactory,
 	)
+	if err != nil {
+		errUtil.HandlePanicError(&commonModel.ServerError{
+			Msg: commonModel.INIT_EVENT_REGISTRAR_PANIC,
+			Err: err,
+		})
+	}
 }
 
 // Start 异步启动服务器
