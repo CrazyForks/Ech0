@@ -21,6 +21,8 @@ import (
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
 	jsonUtil "github.com/lin-snow/ech0/internal/util/json"
 	jwtUtil "github.com/lin-snow/ech0/internal/util/jwt"
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
+	"go.uber.org/zap"
 )
 
 type SettingService struct {
@@ -634,9 +636,11 @@ func (settingService *SettingService) CreateAccessToken(
 		CreatedAt: time.Now(),
 	}
 
-	settingService.txManager.Run(func(ctx context.Context) error {
+	if err := settingService.txManager.Run(func(ctx context.Context) error {
 		return settingService.settingRepository.CreateAccessToken(ctx, accessToken)
-	})
+	}); err != nil {
+		return "", err
+	}
 
 	return tokenString, nil
 }
@@ -652,11 +656,9 @@ func (settingService *SettingService) DeleteAccessToken(userid, id uint) error {
 		return errors.New(commonModel.NO_PERMISSION_DENIED)
 	}
 
-	settingService.txManager.Run(func(ctx context.Context) error {
+	return settingService.txManager.Run(func(ctx context.Context) error {
 		return settingService.settingRepository.DeleteAccessTokenByID(ctx, id)
 	})
-
-	return nil
 }
 
 // GetFediverseSetting 获取联邦网络设置
@@ -799,7 +801,7 @@ func (settingService *SettingService) UpdateBackupScheduleSetting(
 		}
 
 		// 发送更新备份计划的事件
-		settingService.eventBus.Publish(
+		if err := settingService.eventBus.Publish(
 			context.Background(),
 			event.NewEvent(
 				event.EventTypeUpdateBackupSchedule,
@@ -807,7 +809,9 @@ func (settingService *SettingService) UpdateBackupScheduleSetting(
 					event.EventPayloadSchedule: setting,
 				},
 			),
-		)
+		); err != nil {
+			logUtil.GetLogger().Error("Failed to publish update backup schedule event", zap.String("error", err.Error()))
+		}
 
 		return nil
 	})

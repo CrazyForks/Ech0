@@ -23,6 +23,8 @@ import (
 	"github.com/lin-snow/ech0/internal/transaction"
 	cryptoUtil "github.com/lin-snow/ech0/internal/util/crypto"
 	jwtUtil "github.com/lin-snow/ech0/internal/util/jwt"
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
+	"go.uber.org/zap"
 )
 
 // UserService 用户服务结构体，提供用户相关的业务逻辑处理
@@ -153,7 +155,7 @@ func (userService *UserService) Register(registerDto *authModel.RegisterDto) err
 
 	// 发布用户注册事件
 	newUser.Password = "" // 不包含密码信息
-	userService.eventBus.Publish(
+	if err := userService.eventBus.Publish(
 		context.Background(),
 		event.NewEvent(
 			event.EventTypeUserCreated,
@@ -161,7 +163,9 @@ func (userService *UserService) Register(registerDto *authModel.RegisterDto) err
 				event.EventPayloadUser: newUser,
 			},
 		),
-	)
+	); err != nil {
+		logUtil.GetLogger().Error("Failed to publish user created event", zap.String("error", err.Error()))
+	}
 
 	return nil
 }
@@ -219,7 +223,7 @@ func (userService *UserService) UpdateUser(userid uint, userdto model.UserInfoDt
 
 	// 发布用户更新事件
 	user.Password = "" // 不包含密码信息
-	userService.eventBus.Publish(
+	if err := userService.eventBus.Publish(
 		context.Background(),
 		event.NewEvent(
 			event.EventTypeUserUpdated,
@@ -227,7 +231,9 @@ func (userService *UserService) UpdateUser(userid uint, userdto model.UserInfoDt
 				event.EventPayloadUser: user,
 			},
 		),
-	)
+	); err != nil {
+		logUtil.GetLogger().Error("Failed to publish user updated event", zap.String("error", err.Error()))
+	}
 
 	return nil
 }
@@ -279,7 +285,7 @@ func (userService *UserService) UpdateUserAdmin(userid uint, id uint) error {
 
 	// 发布用户更新事件
 	user.Password = "" // 不包含密码信息
-	userService.eventBus.Publish(
+	if err := userService.eventBus.Publish(
 		context.Background(),
 		event.NewEvent(
 			event.EventTypeUserUpdated,
@@ -287,7 +293,9 @@ func (userService *UserService) UpdateUserAdmin(userid uint, id uint) error {
 				event.EventPayloadUser: user,
 			},
 		),
-	)
+	); err != nil {
+		logUtil.GetLogger().Error("Failed to publish user updated event", zap.String("error", err.Error()))
+	}
 
 	return nil
 }
@@ -674,7 +682,7 @@ func (userService *UserService) resolveOAuthCallback(
 			return ""
 		}
 
-		userService.txManager.Run(func(ctx context.Context) error {
+		_ = userService.txManager.Run(func(ctx context.Context) error {
 			return userService.userRepository.BindOAuth(ctx, oauthState.UserID, provider, externalID)
 		})
 

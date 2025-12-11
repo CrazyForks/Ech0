@@ -56,7 +56,7 @@ func (ap *AgentProcessor) Handle(ctx context.Context, e *Event) error {
 	}
 
 	// 清理生成内容的缓存
-	ap.clearCache()
+	_ = ap.clearCache()
 
 	// 更新平行人格
 	if err := ap.updatePersona(&agentSetting, e); err != nil {
@@ -72,10 +72,8 @@ func (ap *AgentProcessor) Handle(ctx context.Context, e *Event) error {
 }
 
 func (ap *AgentProcessor) clearCache() error {
-	// 删除 AGENT_GEN_RECENT 缓存
-	ap.keyvalueRepo.DeleteKeyValue(context.Background(), string(agent.GEN_RECENT))
-
-	return nil
+	// 删除 AGENT_GEN_RECENT 缓存(忽略 err)
+	return ap.keyvalueRepo.DeleteKeyValue(context.Background(), string(agent.GEN_RECENT))
 }
 
 func (ap *AgentProcessor) updatePersona(setting *settingModel.AgentSetting, e *Event) error {

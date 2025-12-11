@@ -450,11 +450,9 @@ func (echoService *EchoService) DeleteTag(userid, id uint) error {
 		return errors.New(commonModel.NO_PERMISSION_DENIED)
 	}
 
-	echoService.txManager.Run(func(ctx context.Context) error {
+	return echoService.txManager.Run(func(ctx context.Context) error {
 		return echoService.echoRepository.DeleteTagById(ctx, id)
 	})
-
-	return nil
 }
 
 // ProcessEchoTags 处理Echo的标签
