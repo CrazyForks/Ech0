@@ -62,6 +62,7 @@ type AppConfig struct {
 	} `yaml:"upload"`
 	Setting struct {
 		SiteTitle     string `yaml:"sitetitle"`     // 网站标题
+		ServerLogo    string `yaml:"serverlogo"`    // 服务器Logo
 		Servername    string `yaml:"servername"`    // 服务器名称
 		Serverurl     string `yaml:"serverurl"`     // 服务器 URL
 		AllowRegister bool   `yaml:"allowregister"` // 是否允许注册

@@ -36,8 +36,8 @@
 <script setup lang="ts">
 import Hello from '@/components/icons/hello.vue'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref } from 'vue'
-import { fetchGetStatus, fetchHelloEch0 } from '@/service/api'
+import { ref } from 'vue'
+import { fetchHelloEch0 } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
 import { useThemeStore } from '@/stores/theme'
 import { getApiUrl } from '@/service/request/shared'
@@ -50,6 +50,9 @@ const { SystemSetting } = storeToRefs(settingStore)
 
 const apiUrl = getApiUrl()
 const logo = ref<string>('/favicon.svg')
+if (SystemSetting.value.server_logo && SystemSetting.value.server_logo !== '') {
+  logo.value = `${apiUrl}${SystemSetting.value.server_logo}`
+}
 
 const handleHello = () => {
   themeStore.toggleTheme()
@@ -72,17 +75,6 @@ const handleHello = () => {
     }
   })
 }
-
-onMounted(() => {
-  fetchGetStatus().then((res) => {
-    if (res.code === 1) {
-      const theLogo = res.data.logo
-      if (theLogo && theLogo !== '') {
-        logo.value = `${apiUrl}${theLogo}`
-      }
-    }
-  })
-})
 </script>
 
 <style scoped></style>

@@ -180,6 +180,7 @@ declare namespace App {
     namespace Setting {
       type SystemSetting = {
         site_title: string
+        server_logo: string
         server_name: string
         server_url: string
         allow_register: boolean

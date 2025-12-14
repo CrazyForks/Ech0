@@ -59,6 +59,7 @@ func (settingService *SettingService) GetSetting(setting *model.SystemSetting) e
 		if err != nil {
 			// 数据库中不存在数据，手动添加初始数据
 			setting.SiteTitle = config.Config.Setting.SiteTitle
+			setting.ServerLogo = config.Config.Setting.ServerLogo
 			setting.ServerName = config.Config.Setting.Servername
 			setting.ServerURL = config.Config.Setting.Serverurl
 			setting.AllowRegister = config.Config.Setting.AllowRegister
@@ -109,6 +110,7 @@ func (settingService *SettingService) UpdateSetting(userid uint, newSetting *mod
 
 		var setting model.SystemSetting
 		setting.SiteTitle = newSetting.SiteTitle
+		setting.ServerLogo = newSetting.ServerLogo
 		setting.ServerName = newSetting.ServerName
 		setting.ServerURL = httpUtil.TrimURL(newSetting.ServerURL)
 		setting.AllowRegister = newSetting.AllowRegister

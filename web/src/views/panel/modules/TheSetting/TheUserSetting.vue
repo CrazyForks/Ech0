@@ -19,7 +19,7 @@
       </div>
 
       <!-- 头像 -->
-      <div class="flex justify-start items-center">
+      <div class="flex justify-start items-center mb-2">
         <img
           :src="
             !user?.avatar || user?.avatar.length === 0
