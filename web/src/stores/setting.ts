@@ -214,11 +214,11 @@ export const useSettingStore = defineStore('settingStore', () => {
     }
   }
 
-  const init = () => {
+  const init = async () => {
     if (!isSystemReady.value) {
-      getSystemReady()
+      await getSystemReady()
     }
-    getSystemSetting()
+    await getSystemSetting()
     getCommentSetting()
     getS3Setting()
     getAgentInfo()
