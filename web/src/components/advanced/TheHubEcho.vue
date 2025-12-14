@@ -120,7 +120,7 @@
       <!-- 操作按钮 -->
       <div ref="menuRef" class="relative flex items-center justify-center gap-2 h-auto">
         <!-- 跳转 -->
-        <a :href="`${server_url}/echo/${echo_id}`" target="_blank" title="跳转支持该 Echo">
+        <a :href="`${server_url}/echo/${echo_id}`" target="_blank" title="跳转至该 Echo">
           <LinkTo class="w-4 h-4" />
         </a>
 
