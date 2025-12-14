@@ -141,9 +141,9 @@ func (connectService *ConnectService) GetConnect() (model.Connect, error) {
 		trimmedServerURL = trimmedServerURL[:len(trimmedServerURL)-1]
 	}
 
-	if status.Logo != "" {
+	if setting.ServerLogo != "" {
 		// 如果 Logo URL 以 / 开头，去掉一个 /
-		logoPath := status.Logo
+		logoPath := setting.ServerLogo
 		if len(logoPath) > 0 && logoPath[0] == '/' {
 			logoPath = logoPath[1:]
 		}
