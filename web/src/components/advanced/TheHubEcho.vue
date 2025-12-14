@@ -124,8 +124,8 @@
           <div class="flex items-center gap-1">
             <!-- 点赞按钮   -->
             <button
+              @click="handleLikeEcho()"
               title="点赞"
-              disabled="true"
               :class="[
                 'transform transition-transform duration-150',
                 isLikeAnimating ? 'scale-160' : 'scale-100',
@@ -160,6 +160,9 @@ import { onMounted, computed, ref } from 'vue'
 import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
 import { useThemeStore } from '@/stores/theme'
+import { useFetch } from '@vueuse/core'
+import { theToast } from '@/utils/toast'
+import { localStg } from '@/utils/storage'
 
 type Echo = App.Api.Hub.Echo
 
@@ -180,7 +183,40 @@ const previewOptions = {
   autoFoldThreshold: 15,
 }
 
+const server_url = props.echo.server_url
+const echo_id = props.echo.id
 const isLikeAnimating = ref(false)
+const LIKE_LIST_KEY = server_url + '_liked_echo_ids'
+
+const handleLikeEcho = async () => {
+  isLikeAnimating.value = true
+  setTimeout(() => {
+    isLikeAnimating.value = false
+  }, 250)
+
+  // 如果已经点赞过，不再重复点赞
+  const likedEchoIds: number[] = localStg.getItem(LIKE_LIST_KEY) || []
+  if (likedEchoIds.includes(echo_id)) {
+    theToast.info('你已经点赞过')
+    return
+  }
+
+  // 调用后端接口，点赞
+  const { error, data } = await useFetch<App.Api.Response<null>>(
+    `${server_url}/api/echo/like/${echo_id}`,
+  )
+    .put()
+    .json()
+
+  if (error.value || data.value?.code !== 1) {
+    theToast.error('点赞失败')
+  } else {
+    props.echo.fav_count += 1
+    likedEchoIds.push(echo_id)
+    localStg.setItem(LIKE_LIST_KEY, likedEchoIds)
+    theToast.success('点赞成功')
+  }
+}
 
 onMounted(() => {})
 </script>
