@@ -119,6 +119,11 @@
 
       <!-- 操作按钮 -->
       <div ref="menuRef" class="relative flex items-center justify-center gap-2 h-auto">
+        <!-- 跳转 -->
+        <a :href="`${server_url}/echo/${echo_id}`" target="_blank" title="跳转支持该 Echo">
+          <LinkTo class="w-4 h-4" />
+        </a>
+
         <!-- 点赞 -->
         <div class="flex items-center justify-end" title="点赞">
           <div class="flex items-center gap-1">
@@ -137,7 +142,7 @@
             <!-- 点赞数量   -->
             <span class="text-sm text-[var(--text-color-400)]">
               <!-- 如果点赞数不超过99，则显示数字，否则显示99+ -->
-              {{ props.echo.fav_count > 99 ? '99+' : props.echo.fav_count }}
+              {{ fav_count > 99 ? '99+' : fav_count }}
             </span>
           </div>
         </div>
@@ -151,6 +156,7 @@ import TheGithubCard from './TheGithubCard.vue'
 import TheVideoCard from './TheVideoCard.vue'
 import Verified from '../icons/verified.vue'
 import GrayLike from '../icons/graylike.vue'
+import LinkTo from '../icons/linkto.vue'
 import TheAPlayerCard from './TheAPlayerCard.vue'
 import TheWebsiteCard from './TheWebsiteCard.vue'
 import TheImageGallery from './TheImageGallery.vue'
@@ -183,6 +189,7 @@ const previewOptions = {
   autoFoldThreshold: 15,
 }
 
+const fav_count = ref<number>(props.echo.fav_count)
 const server_url = props.echo.server_url
 const echo_id = props.echo.id
 const isLikeAnimating = ref(false)
@@ -211,7 +218,7 @@ const handleLikeEcho = async () => {
   if (error.value || data.value?.code !== 1) {
     theToast.error('点赞失败')
   } else {
-    props.echo.fav_count += 1
+    fav_count.value += 1
     likedEchoIds.push(echo_id)
     localStg.setItem(LIKE_LIST_KEY, likedEchoIds)
     theToast.success('点赞成功')
