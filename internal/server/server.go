@@ -120,11 +120,9 @@ func (s *Server) Start() {
 			})
 		}
 	}()
-	// log.Println("🚀 Ech0 Server已启动")
 
 	// 启动任务器
 	go s.tasker.Start()
-	// log.Println("🤖 任务器已启动")
 
 	// 注册事件
 	if err := s.eventRegistrar.Register(); err != nil {
