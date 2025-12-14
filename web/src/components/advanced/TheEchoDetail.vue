@@ -173,7 +173,6 @@ import { fetchLikeEcho } from '@/service/api'
 import { theToast } from '@/utils/toast'
 import { localStg } from '@/utils/storage'
 import { storeToRefs } from 'pinia'
-import { fetchGetStatus } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
 import { getApiUrl } from '@/service/request/shared'
 import { ExtensionType, ImageLayout } from '@/enums/enums'
@@ -250,10 +249,13 @@ const { SystemSetting } = storeToRefs(settingStore)
 
 const apiUrl = getApiUrl()
 const logo = ref<string>('/Ech0.svg')
-if (SystemSetting.value.server_logo && SystemSetting.value.server_logo !== '' && SystemSetting.value.server_logo !== 'Ech0.svg') {
+if (
+  SystemSetting.value.server_logo &&
+  SystemSetting.value.server_logo !== '' &&
+  SystemSetting.value.server_logo !== 'Ech0.svg'
+) {
   logo.value = `${apiUrl}${SystemSetting.value.server_logo}`
 }
-
 </script>
 
 <style scoped lang="css">

@@ -44,7 +44,7 @@ export const useThemeStore = defineStore('themeStore', () => {
         theme.value = 'dark'
         break
     }
-    
+
     document.documentElement.classList.remove('light', 'dark')
     document.documentElement.classList.add(theme.value)
     localStg.setItem('theme', theme.value)
