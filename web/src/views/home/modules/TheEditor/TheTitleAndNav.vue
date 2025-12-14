@@ -60,14 +60,15 @@ if (
 
 const handleHello = () => {
   themeStore.toggleTheme()
-
+  const modeText = themeStore.mode === 'system' ? 'Auto' : (themeStore.mode === 'light' ? 'Light' : 'Dark')
+  
   const hello = ref<App.Api.Ech0.HelloEch0>()
 
   fetchHelloEch0().then((res) => {
     if (res.code === 1) {
       hello.value = res.data
       theToast.success('你好呀！ 👋', {
-        description: `当前版本：v${hello.value.version}`,
+        description: `当前版本：v${hello.value.version} | ${modeText}`,
         duration: 2000,
         action: {
           label: 'Github',
