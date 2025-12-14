@@ -249,7 +249,7 @@ const settingStore = useSettingStore()
 const { SystemSetting } = storeToRefs(settingStore)
 
 const apiUrl = getApiUrl()
-const logo = ref<string>('/favicon.svg')
+const logo = ref<string>('/Ech0.svg')
 
 onMounted(() => {
   fetchGetStatus().then((res) => {

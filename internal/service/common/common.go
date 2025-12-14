@@ -317,7 +317,7 @@ func (commonService *CommonService) GenerateRSS(ctx *gin.Context) (string, error
 			Href: fmt.Sprintf("%s://%s/", schema, host),
 		},
 		Image: &feeds.Image{
-			Url: fmt.Sprintf("%s://%s/favicon.ico", schema, host),
+			Url: fmt.Sprintf("%s://%s/Ech0.svg", schema, host),
 		},
 		Description: "Ech0",
 		Author: &feeds.Author{

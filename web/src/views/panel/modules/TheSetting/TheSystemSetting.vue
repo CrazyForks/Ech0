@@ -22,8 +22,9 @@
         <div class="w-28 sm:w-23">
           <img
             :src="
-              !SystemSetting?.server_logo || SystemSetting?.server_logo.length === 0
-                ? '/favicon.svg'
+              (!SystemSetting?.server_logo || SystemSetting?.server_logo.length === 0) &&
+              SystemSetting?.server_logo !== 'Ech0.svg'
+                ? '/Ech0.svg'
                 : `${API_URL}${SystemSetting?.server_logo}`
             "
             alt="头像"
@@ -244,7 +245,7 @@ const handleUploadImage = async (event: Event) => {
     if (res.code === 1 && res.data.length > 0) {
       SystemSetting.value.server_logo = res.data
     } else {
-      SystemSetting.value.server_logo = '/favicon.svg'
+      SystemSetting.value.server_logo = '/Ech0.svg'
     }
   } catch (err) {
     console.error('上传异常', err)

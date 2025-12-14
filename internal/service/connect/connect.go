@@ -149,7 +149,7 @@ func (connectService *ConnectService) GetConnect() (model.Connect, error) {
 		}
 		connect.Logo = fmt.Sprintf("%s/api/%s", trimmedServerURL, logoPath)
 	} else {
-		connect.Logo = fmt.Sprintf("%s/favicon.svg", trimmedServerURL)
+		connect.Logo = fmt.Sprintf("%s/Ech0.svg", trimmedServerURL)
 	}
 
 	return connect, nil

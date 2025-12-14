@@ -49,8 +49,12 @@ const themeStore = useThemeStore()
 const { SystemSetting } = storeToRefs(settingStore)
 
 const apiUrl = getApiUrl()
-const logo = ref<string>('/favicon.svg')
-if (SystemSetting.value.server_logo && SystemSetting.value.server_logo !== '') {
+const logo = ref<string>('/Ech0.svg')
+if (
+  SystemSetting.value.server_logo &&
+  SystemSetting.value.server_logo !== '' &&
+  SystemSetting.value.server_logo !== '/Ech0.svg'
+) {
   logo.value = `${apiUrl}${SystemSetting.value.server_logo}`
 }
 

@@ -22,9 +22,7 @@
       <div class="flex justify-start items-center mb-2">
         <img
           :src="
-            !user?.avatar || user?.avatar.length === 0
-              ? '/favicon.svg'
-              : `${API_URL}${user?.avatar}`
+            !user?.avatar || user?.avatar.length === 0 ? '/Ech0.svg' : `${API_URL}${user?.avatar}`
           "
           alt="头像"
           class="w-12 h-12 rounded-full ml-2 mr-9 ring-1 ring-gray-200 shadow-sm"

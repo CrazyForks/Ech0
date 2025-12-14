@@ -186,9 +186,7 @@ export const useHubStore = defineStore('hubStore', () => {
           server_name: hubInfoMap.value.get(url)?.server_name || 'Ech0',
           server_url: url,
           logo:
-            hubInfoMap.value.get(url)?.logo !== ''
-              ? hubInfoMap.value.get(url)?.logo
-              : '/favicon.ico',
+            hubInfoMap.value.get(url)?.logo !== '' ? hubInfoMap.value.get(url)?.logo : '/Ech0.svg',
         }))
       })
 
