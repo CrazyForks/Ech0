@@ -250,17 +250,10 @@ const { SystemSetting } = storeToRefs(settingStore)
 
 const apiUrl = getApiUrl()
 const logo = ref<string>('/Ech0.svg')
+if (SystemSetting.value.server_logo && SystemSetting.value.server_logo !== '' && SystemSetting.value.server_logo !== 'Ech0.svg') {
+  logo.value = `${apiUrl}${SystemSetting.value.server_logo}`
+}
 
-onMounted(() => {
-  fetchGetStatus().then((res) => {
-    if (res.code === 1) {
-      const theLogo = res.data.logo
-      if (theLogo && theLogo !== '') {
-        logo.value = `${apiUrl}${theLogo}`
-      }
-    }
-  })
-})
 </script>
 
 <style scoped lang="css">
