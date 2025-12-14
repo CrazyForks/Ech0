@@ -151,7 +151,7 @@ func GetEch0Info() string {
 	content := lipgloss.JoinVertical(lipgloss.Left,
 		infoStyle.Render("📦 "+titleStyle.Render("Version")+": "+highlight.Render(commonModel.Version)),
 		infoStyle.Render("🧙 "+titleStyle.Render("Author")+": "+highlight.Render("L1nSn0w")),
-		infoStyle.Render("👉 "+titleStyle.Render("Website")+": "+highlight.Render("https://echo.soopy.cn/")),
+		infoStyle.Render("👉 "+titleStyle.Render("Website")+": "+highlight.Render("https://ech0.app/")),
 		infoStyle.Render("👉 "+titleStyle.Render("GitHub")+": "+highlight.Render("https://github.com/lin-snow/Ech0")),
 	)
 
