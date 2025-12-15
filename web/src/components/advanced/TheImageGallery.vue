@@ -11,18 +11,15 @@
       <button
         v-for="(src, idx) in images"
         :key="idx"
-        class="bg-transparent border-0 p-0 cursor-pointer relative block w-full overflow-hidden"
+        class="bg-transparent border-0 p-0 cursor-pointer w-fit"
         :class="getColSpan(idx, images.length)"
-        :style="{
-          paddingTop: src.width && src.height ? `${(src.height / src.width) * 100}%` : '100%',
-        }"
         @click="openFancybox(idx)"
       >
         <img
           :src="baseUrl ? getHubImageUrl(src, baseUrl) : getImageUrl(src)"
           :alt="`预览图片${idx + 1}`"
           loading="lazy"
-          class="echoimg w-full h-full object-cover absolute top-0 left-0",
+          class="echoimg block max-w-full h-auto"
         />
       </button>
     </div>
