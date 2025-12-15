@@ -95,6 +95,7 @@ import { theToast } from '@/utils/toast'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/user'
 import { getApiUrl } from '@/service/request/shared'
+import { ImageSource } from '@/enums/enums'
 
 const userStore = useUserStore()
 const { refreshCurrentUser } = userStore
@@ -138,16 +139,16 @@ const handleUploadImage = async (event: Event) => {
   if (!file) return
 
   try {
-    const res = await theToast.promise(fetchUploadImage(file), {
+    const res = await theToast.promise(fetchUploadImage(file, ImageSource.LOCAL), {
       loading: '头像上传中...',
       success: '头像上传成功！',
       error: '上传失败，请稍后再试',
     })
 
     // 只需处理成功结果即可，失败的 toast 已由 request() 自动处理
-    if (res.code === 1) {
-      userInfo.value.avatar = res.data
-      if (user.value) user.value.avatar = res.data
+    if (res.code === 1 && res.data.url) {
+      userInfo.value.avatar = res.data.url
+      if (user.value) user.value.avatar = res.data.url
     }
   } catch (err) {
     console.error('上传异常', err)

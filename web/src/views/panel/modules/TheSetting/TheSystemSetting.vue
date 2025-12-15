@@ -197,6 +197,7 @@ import Close from '@/components/icons/close.vue'
 import Saveupdate from '@/components/icons/saveupdate.vue'
 import { ref, onMounted } from 'vue'
 import { fetchUpdateSettings, fetchUploadImage } from '@/service/api'
+import { ImageSource } from '@/enums/enums'
 import { theToast } from '@/utils/toast'
 import { useSettingStore } from '@/stores/setting'
 import { storeToRefs } from 'pinia'
@@ -235,15 +236,15 @@ const handleUploadImage = async (event: Event) => {
   if (!file) return
 
   try {
-    const res = await theToast.promise(fetchUploadImage(file), {
+    const res = await theToast.promise(fetchUploadImage(file, ImageSource.LOCAL), {
       loading: '服务器 Logo 上传中...',
       success: '服务器 Logo 上传成功！',
       error: '上传失败，请稍后再试',
     })
 
     // 只需处理成功结果即可，失败的 toast 已由 request() 自动处理
-    if (res.code === 1 && res.data.length > 0) {
-      SystemSetting.value.server_logo = res.data
+    if (res.code === 1 && res.data.url) {
+      SystemSetting.value.server_logo = res.data.url
     } else {
       SystemSetting.value.server_logo = '/Ech0.svg'
     }

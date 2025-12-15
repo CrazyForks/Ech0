@@ -48,6 +48,16 @@ declare namespace App {
       }
     }
 
+    namespace File {
+      type ImageDto = {
+        url: string
+        source: string
+        object_key?: string
+        width?: number
+        height?: number
+      }
+    }
+
     namespace Ech0 {
       type ParamsByPagination = {
         page: number

@@ -88,6 +88,7 @@ require (
 	github.com/cloudwego/eino-ext/libs/acl/openai v0.1.2 // indirect
 	github.com/cohesion-org/deepseek-go v1.3.2 // indirect
 	github.com/creack/pty v1.1.24 // indirect
+	github.com/cshum/vipsgen v1.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.9.0 // indirect
 	github.com/eino-contrib/jsonschema v1.0.2 // indirect
