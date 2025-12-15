@@ -71,17 +71,19 @@ func GetImageSizeFromReader(reader io.Reader) (width, height int, err error) {
 		return cfg.Width, cfg.Height, nil
 	}
 
-	// 回退用 libvips 支持 webp/avif 等
-	if err := vipsInit(); err != nil {
-		return 0, 0, err
-	}
-	img, err := vips.NewImageFromBuffer(data, nil)
-	if err != nil {
-		return 0, 0, err
-	}
-	defer img.Close()
+	return 0, 0, nil
 
-	return img.Width(), img.Height(), nil
+	// 回退用 libvips 支持 webp/avif 等
+	// if err := vipsInit(); err != nil {
+	// 	return 0, 0, err
+	// }
+	// img, err := vips.NewImageFromBuffer(data, nil)
+	// if err != nil {
+	// 	return 0, 0, err
+	// }
+	// defer img.Close()
+
+	// return img.Width(), img.Height(), nil
 }
 
 // ConvertImage 转换图片格式
