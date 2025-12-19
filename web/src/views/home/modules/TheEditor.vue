@@ -52,10 +52,9 @@ import TheTagsManager from './TheEditor/TheTagsManager.vue'
 
 import { theToast } from '@/utils/toast'
 import { watch } from 'vue'
-import { useEchoStore } from '@/stores/echo'
+import { useEchoStore, useEditorStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { Mode, ExtensionType, ImageLayout } from '@/enums/enums'
-import { useEditorStore } from '@/stores/editor'
 
 /* --------------- 与Pinia相关 ---------------- */
 const echoStore = useEchoStore()

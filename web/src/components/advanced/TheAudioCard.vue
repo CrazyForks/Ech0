@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { useEditorStore } from '@/stores/editor'
+import { useEditorStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import { getApiUrl } from '@/service/request/shared'

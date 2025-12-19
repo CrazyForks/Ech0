@@ -64,8 +64,7 @@ import Audio from '@/components/icons/audio.vue'
 
 import { theToast } from '@/utils/toast'
 import { Mode, ExtensionType } from '@/enums/enums'
-import { useEditorStore } from '@/stores/editor'
-import { useTodoStore } from '@/stores/todo'
+import { useEditorStore, useTodoStore } from '@/stores'
 
 const editorStore = useEditorStore()
 

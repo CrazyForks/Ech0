@@ -38,7 +38,7 @@ import { ref } from 'vue'
 import { fetchUploadMusic, fetchDeleteMusic } from '@/service/api'
 import { theToast } from '@/utils/toast'
 import { useBaseDialog } from '@/composables/useBaseDialog'
-import { useEditorStore } from '@/stores/editor'
+import { useEditorStore } from '@/stores'
 
 const { openConfirm } = useBaseDialog()
 
