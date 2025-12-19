@@ -12,7 +12,7 @@
         @change="handleUploadMusic"
       />
       <BaseButton
-        :icon="Audio"
+        :icon="UploadMusic"
         @click="handleTriggerUpload"
         class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
         title="上传音乐"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import Audio from '@/components/icons/audio.vue'
+import UploadMusic from '@/components/icons/musicupload.vue'
 import Delete from '@/components/icons/delete.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { ref } from 'vue'

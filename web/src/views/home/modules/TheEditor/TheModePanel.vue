@@ -42,7 +42,7 @@
         <!-- 打开 Todo 模式 -->
         <BaseButton :icon="Todo" @click="handleTodo" class="w-7 h-7 rounded-md" />
         <!-- 打开 收件箱 模式 -->
-        <BaseButton :icon="Todo" @click="handleInbox" class="w-7 h-7 rounded-md" />
+        <BaseButton :icon="Inbox" @click="handleInbox" class="w-7 h-7 rounded-md" />
         <!-- 打开 音乐播放 模式 -->
         <BaseButton
           :icon="Audio"
@@ -59,6 +59,7 @@
 import Weblink from '@/components/icons/weblink.vue'
 import Music from '@/components/icons/music.vue'
 import Todo from '@/components/icons/todo.vue'
+import Inbox from '@/components/icons/inbox.vue'
 import Video from '@/components/icons/video.vue'
 import Githubproj from '@/components/icons/githubproj.vue'
 import BaseButton from '@/components/common/BaseButton.vue'

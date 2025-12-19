@@ -53,6 +53,7 @@ import { useEditorStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import { getApiUrl } from '@/service/request/shared'
+import { theToast } from '@/utils/toast'
 import Album from '../icons/album.vue'
 import Pause from '../icons/pause.vue'
 import Play from '../icons/play.vue'
@@ -95,6 +96,11 @@ function toggleLoop() {
   isLooping.value = !isLooping.value
   if (audioRef.value) {
     audioRef.value.loop = isLooping.value
+  }
+  if (isLooping.value) {
+    theToast.info('已开启循环播放')
+  } else {
+    theToast.info('已关闭循环播放')
   }
 }
 </script>
