@@ -40,17 +40,22 @@ import { ref } from 'vue'
 import { fetchHelloEch0 } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
 import { useThemeStore } from '@/stores/theme'
+import { useUserStore } from '@/stores/user'
 import { getApiUrl } from '@/service/request/shared'
 import { theToast } from '@/utils/toast'
 
 const settingStore = useSettingStore()
 const themeStore = useThemeStore()
+const userStore = useUserStore()
 
 const { SystemSetting } = storeToRefs(settingStore)
+const { user, isLogin } = storeToRefs(userStore)
 
 const apiUrl = getApiUrl()
 const logo = ref<string>('/Ech0.svg')
-if (
+if (isLogin.value && user.value?.avatar && user.value?.avatar !== '') {
+  logo.value = `${apiUrl}${user.value?.avatar}`
+} else if (
   SystemSetting.value.server_logo &&
   SystemSetting.value.server_logo !== '' &&
   SystemSetting.value.server_logo !== '/Ech0.svg'
