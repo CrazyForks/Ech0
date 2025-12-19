@@ -92,9 +92,9 @@ function togglePlay() {
 }
 
 function toggleLoop() {
-  isLooping.value = !isLooping.value;
+  isLooping.value = !isLooping.value
   if (audioRef.value) {
-    audioRef.value.loop = isLooping.value;
+    audioRef.value.loop = isLooping.value
   }
 }
 </script>
