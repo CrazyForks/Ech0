@@ -63,6 +63,7 @@
           currentMode !== Mode.Panel &&
           currentMode !== Mode.TagManage &&
           currentMode !== Mode.PlayMusic &&
+          currentMode !== Mode.INBOX &&
           isUpdateMode === false
         "
       >
@@ -79,6 +80,7 @@
           currentMode !== Mode.Panel &&
           currentMode !== Mode.TODO &&
           currentMode !== Mode.PlayMusic &&
+          currentMode !== Mode.INBOX &&
           isUpdateMode === true
         "
       >

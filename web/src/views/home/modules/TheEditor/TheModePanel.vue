@@ -39,9 +39,11 @@
     <div class="mb-1">
       <h2 class="text-[var(--text-color-400)] font-bold mb-1">模式切换</h2>
       <div class="flex flex-row items-center gap-2">
-        <!-- 打开Todo模式 -->
+        <!-- 打开 Todo 模式 -->
         <BaseButton :icon="Todo" @click="handleTodo" class="w-7 h-7 rounded-md" />
-        <!-- 打开音乐播放模式 -->
+        <!-- 打开 收件箱 模式 -->
+        <BaseButton :icon="Todo" @click="handleInbox" class="w-7 h-7 rounded-md" />
+        <!-- 打开 音乐播放 模式 -->
         <BaseButton
           :icon="Audio"
           class="w-7 h-7 rounded-md"
@@ -64,12 +66,11 @@ import Audio from '@/components/icons/audio.vue'
 
 import { theToast } from '@/utils/toast'
 import { Mode, ExtensionType } from '@/enums/enums'
-import { useEditorStore, useTodoStore } from '@/stores'
+import { useEditorStore, useTodoStore, useInboxStore } from '@/stores'
 
 const editorStore = useEditorStore()
-
-const todoStore = useTodoStore()
-const { setTodoMode } = todoStore
+const { setInboxMode } = useInboxStore()
+const { setTodoMode } = useTodoStore()
 
 const handleAddExtension = (extensiontype: ExtensionType) => {
   editorStore.currentMode = Mode.EXTEN
@@ -79,8 +80,16 @@ const handleAddExtension = (extensiontype: ExtensionType) => {
 
 const handleTodo = () => {
   setTodoMode(true)
+  setInboxMode(false)
   editorStore.currentMode = Mode.TODO
   theToast.info('已切换到 Todo 模式')
+}
+
+const handleInbox = () => {
+  setInboxMode(true)
+  setTodoMode(false)
+  editorStore.currentMode = Mode.INBOX
+  theToast.info('已切换到 收件箱 模式')
 }
 
 const handlePlayMusic = () => {

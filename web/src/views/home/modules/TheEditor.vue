@@ -9,6 +9,7 @@
 
       <!-- The Editor -->
       <div class="rounded-lg p-2 sm:p-3 mb-1">
+        <!-- EchoMode : TheMdEditor -->
         <TheMdEditor v-if="currentMode === Mode.ECH0" class="rounded-lg" />
 
         <!-- ImageMode : TheImageEditor -->
@@ -26,6 +27,7 @@
         <!-- ExtensionMode: TheExtensionEditor -->
         <TheExtensionEditor v-if="currentMode === Mode.EXTEN" />
 
+        <!-- TagManageMode: TheTagsManager -->
         <TheTagsManager v-if="currentMode === Mode.TagManage" />
       </div>
 
