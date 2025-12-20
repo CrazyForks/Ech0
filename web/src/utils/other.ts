@@ -74,7 +74,7 @@ export const parseMusicURL = (url: string) => {
       type = 'song'
     } else if (/(\/|#\/|\/m\/)playlist/.test(url)) {
       type = 'playlist'
-    } 
+    }
     // else if (/(\/|#\/|\/m\/)album/.test(url)) {
     //   type = 'album'
     // }
@@ -127,7 +127,7 @@ export const parseMusicURL = (url: string) => {
   /* =======================
    * Apple Music
    * ======================= */
-if (/^https:\/\/music\.apple\.com/i.test(url)) {
+  if (/^https:\/\/music\.apple\.com/i.test(url)) {
     const appleMatch = url.match(/\/(song|album)\/[^/]+\/(\d+)/)
     if (!appleMatch) return null
 
@@ -164,7 +164,6 @@ export const extractAndCleanMusicURL = (input: string): string | null => {
     }
 
     case MusicProvider.QQ: {
-      // ======================= 修改部分 =======================
       // 根据 type 分别生成歌曲或歌单的规范化链接
       if (parsed.type === 'song') {
         return `https://y.qq.com/n/ryqq_v2/songDetail/${parsed.id}`
@@ -174,7 +173,6 @@ export const extractAndCleanMusicURL = (input: string): string | null => {
         // 使用统一的歌单路径格式
         return `https://y.qq.com/n/ryqq_v2/playlist/${parsed.id}`
       }
-      // =======================================================
       
       // 如果是其他未知类型，则返回 null
       return null
@@ -182,7 +180,7 @@ export const extractAndCleanMusicURL = (input: string): string | null => {
 
     case MusicProvider.APPLE: {
       // 去掉后面的参数
-      const cleanUrl = text.split('?')[0]
+      const cleanUrl = rawUrl.split('?')[0]
       return cleanUrl ?? rawUrl
     }
 
