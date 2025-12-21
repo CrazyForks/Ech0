@@ -2,18 +2,25 @@
   <PanelCard>
     <div class="w-full">
       <div class="flex flex-row items-center justify-between mb-3">
-        <h1 class="text-[var(--text-color-600)] font-bold text-lg">Passkey（多设备）</h1>
+        <h1 class="text-[var(--text-color-700)] font-bold text-lg">Passkey</h1>
       </div>
 
-      <div class="text-[var(--text-color-next-500)] text-sm mb-3">
+      <div class="text-[var(--text-color-next-400)] text-sm mb-3">
         使用 Passkey（WebAuthn）可在不同设备上无密码登录；删除某设备后，该设备将无法再登录。
       </div>
 
       <!-- 绑定 -->
-      <div class="flex flex-row items-center justify-start gap-2 mb-4">
-        <BaseInput v-model="newDeviceName" type="text" placeholder="设备名称（可选）" class="w-full py-1!" />
+      <div class="flex items-center justify-start gap-2 mb-4">
+        <div class="w-48">
+          <BaseInput
+            v-model="newDeviceName"
+            type="text"
+            placeholder="设备名称（可选）"
+            class="py-1 text-sm"
+          />
+        </div>
         <BaseButton
-          class="rounded-md px-3 w-20 h-9"
+          class="rounded-md px-3 w-20 h-9 text-sm flex items-center justify-center"
           :disabled="busy || !supported"
           @click="handleBind"
         >
@@ -21,14 +28,13 @@
         </BaseButton>
       </div>
 
-      <div v-if="!supported" class="text-[var(--text-color-next-500)] text-sm mb-3">
+      <div v-if="!supported" class="text-[var(--text-color-next-400)] text-sm mb-3">
         当前浏览器不支持 Passkey / WebAuthn。
       </div>
 
       <!-- 多设备管理 -->
-
-      <div class="text-[var(--text-color-next-500)] font-semibold mb-2">已绑定设备</div>
-      <div v-if="devices.length === 0" class="text-[var(--text-color-next-500)] text-sm">
+      <div class="text-[var(--text-color-next-400)] font-semibold mb-2">已绑定设备</div>
+      <div v-if="devices.length === 0" class="text-[var(--text-color-next-400)] text-sm">
         暂无设备
       </div>
       <div v-else class="mt-2 overflow-x-auto border border-[var(--border-color-300)] rounded-lg">
@@ -107,6 +113,8 @@ import {
   fetchUpdatePasskeyDeviceName,
 } from '@/service/api'
 import { theToast } from '@/utils/toast'
+import { useBaseDialog } from '@/composables/useBaseDialog'
+const { openConfirm } = useBaseDialog()
 
 const supported = !!(window.PublicKeyCredential && navigator.credentials)
 const busy = ref(false)
@@ -246,15 +254,21 @@ async function handleBind() {
 }
 
 async function handleDelete(id: number) {
-  busy.value = true
-  try {
-    const res = await fetchDeletePasskeyDevice(id)
-    if (res.code !== 1) return
-    theToast.success('已删除')
-    await refresh()
-  } finally {
-    busy.value = false
-  }
+  openConfirm({
+    title: '确定要删除该设备吗？',
+    description: '删除后该设备将无法登录，请谨慎操作',
+    onConfirm: async () => {
+      busy.value = true
+      try {
+        const res = await fetchDeletePasskeyDevice(id)
+        if (res.code !== 1) return
+        theToast.success('已删除')
+        await refresh()
+      } finally {
+        busy.value = false
+      }
+    },
+  })
 }
 
 async function promptRename(d: App.Api.Auth.PasskeyDevice) {
