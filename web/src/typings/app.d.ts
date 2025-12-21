@@ -23,6 +23,25 @@ declare namespace App {
         username: string
         password: string
       }
+
+      // Passkey / WebAuthn
+      type PasskeyRegisterBeginResp = {
+        nonce: string
+        publicKey: unknown
+      }
+
+      type PasskeyLoginBeginResp = {
+        nonce: string
+        publicKey: unknown
+      }
+
+      type PasskeyDevice = {
+        id: number
+        device_name: string
+        aaguid: string
+        last_used_at: string
+        created_at: string
+      }
     }
 
     namespace User {

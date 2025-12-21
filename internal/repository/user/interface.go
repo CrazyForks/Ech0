@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"time"
 
+	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	model "github.com/lin-snow/ech0/internal/model/user"
 )
 
@@ -42,4 +44,17 @@ type UserRepositoryInterface interface {
 
 	// GetOAuthOIDCInfo 获取 OIDC 信息
 	GetOAuthOIDCInfo(userId uint, provider string, issuer string) (model.OAuthBinding, error)
+
+	// Passkey / WebAuthn
+	CreatePasskey(ctx context.Context, passkey *authModel.Passkey) error
+	ListPasskeysByUserID(userID uint) ([]authModel.Passkey, error)
+	GetPasskeyByCredentialID(credentialID string) (authModel.Passkey, error)
+	UpdatePasskeyUsage(ctx context.Context, passkeyID uint, signCount uint32, lastUsedAt time.Time) error
+	UpdatePasskeyDeviceName(ctx context.Context, userID, passkeyID uint, deviceName string) error
+	DeletePasskeyByID(ctx context.Context, userID, passkeyID uint) error
+
+	// Passkey 会话缓存（challenge/session）
+	CacheSetPasskeySession(key string, val any, ttl time.Duration)
+	CacheGetPasskeySession(key string) (any, error)
+	CacheDeletePasskeySession(key string)
 }

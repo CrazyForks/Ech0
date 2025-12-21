@@ -4,6 +4,9 @@ package service
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +15,10 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/go-webauthn/webauthn/protocol"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/lin-snow/ech0/internal/event"
 	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
@@ -1081,4 +1087,350 @@ func (userService *UserService) GetOAuthInfo(userId uint, provider string) (mode
 	}
 
 	return oauthInfo, nil
+}
+
+// -----------------------
+// Passkey / WebAuthn
+// -----------------------
+
+const passkeySessionTTL = 5 * time.Minute
+
+type passkeySessionCache struct {
+	Session    webauthn.SessionData
+	Origin     string
+	DeviceName string
+}
+
+type webauthnUser struct {
+	u           model.User
+	userHandle  []byte
+	credentials []webauthn.Credential
+}
+
+func (w *webauthnUser) WebAuthnID() []byte {
+	return w.userHandle
+}
+
+func (w *webauthnUser) WebAuthnName() string {
+	return w.u.Username
+}
+
+func (w *webauthnUser) WebAuthnDisplayName() string {
+	return w.u.Username
+}
+
+func (w *webauthnUser) WebAuthnCredentials() []webauthn.Credential {
+	return w.credentials
+}
+
+func newNonce() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
+func makeUserHandle(userID uint) []byte {
+	buf := make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, uint64(userID))
+	return buf
+}
+
+func userIDFromHandle(handle []byte) uint {
+	if len(handle) < 8 {
+		return 0
+	}
+	return uint(binary.BigEndian.Uint64(handle[:8]))
+}
+
+func (userService *UserService) newWebAuthn(rpID, origin string) (*webauthn.WebAuthn, error) {
+	return webauthn.New(&webauthn.Config{
+		RPDisplayName: "Ech0",
+		RPID:          rpID,
+		RPOrigins:     []string{origin},
+	})
+}
+
+func (userService *UserService) getWebauthnUserByID(userID uint) (*webauthnUser, model.User, error) {
+	u, err := userService.userRepository.GetUserByID(int(userID))
+	if err != nil {
+		return nil, model.User{}, err
+	}
+
+	passkeys, err := userService.userRepository.ListPasskeysByUserID(userID)
+	if err != nil {
+		return nil, model.User{}, err
+	}
+
+	credentials := make([]webauthn.Credential, 0, len(passkeys))
+	for _, pk := range passkeys {
+		var cred webauthn.Credential
+		if err := json.Unmarshal([]byte(pk.CredentialJSON), &cred); err != nil {
+			continue
+		}
+		// 使用数据库中的计数器作为权威值
+		cred.Authenticator.SignCount = pk.SignCount
+		credentials = append(credentials, cred)
+	}
+
+	return &webauthnUser{
+		u:           u,
+		userHandle:  makeUserHandle(userID),
+		credentials: credentials,
+	}, u, nil
+}
+
+func (userService *UserService) PasskeyRegisterBegin(userID uint, rpID, origin, deviceName string) (authModel.PasskeyRegisterBeginResp, error) {
+	var resp authModel.PasskeyRegisterBeginResp
+
+	wa, err := userService.newWebAuthn(rpID, origin)
+	if err != nil {
+		return resp, err
+	}
+
+	wUser, _, err := userService.getWebauthnUserByID(userID)
+	if err != nil {
+		return resp, err
+	}
+
+	if strings.TrimSpace(deviceName) == "" {
+		deviceName = "Passkey"
+	}
+
+	creation, session, err := wa.BeginRegistration(
+		wUser,
+		webauthn.WithResidentKeyRequirement(protocol.ResidentKeyRequirementRequired),
+		webauthn.WithAuthenticatorSelection(
+			webauthn.SelectAuthenticator("", func() *bool { b := true; return &b }(), string(protocol.VerificationPreferred)),
+		),
+	)
+	if err != nil {
+		return resp, err
+	}
+
+	nonce, err := newNonce()
+	if err != nil {
+		return resp, err
+	}
+
+	userService.userRepository.CacheSetPasskeySession(
+		repository.GetPasskeyRegisterSessionKey(nonce),
+		passkeySessionCache{
+			Session:    *session,
+			Origin:     origin,
+			DeviceName: deviceName,
+		},
+		passkeySessionTTL,
+	)
+
+	resp.Nonce = nonce
+	resp.PublicKey = &creation.Response
+	return resp, nil
+}
+
+func (userService *UserService) PasskeyRegisterFinish(userID uint, rpID, origin, nonce string, credential json.RawMessage) error {
+	cacheKey := repository.GetPasskeyRegisterSessionKey(nonce)
+	cached, err := userService.userRepository.CacheGetPasskeySession(cacheKey)
+	if err != nil {
+		return errors.New(commonModel.INVALID_PARAMS)
+	}
+	// 一次性使用
+	userService.userRepository.CacheDeletePasskeySession(cacheKey)
+
+	sess, ok := cached.(passkeySessionCache)
+	if !ok {
+		return errors.New(commonModel.INVALID_PARAMS)
+	}
+	if sess.Origin != origin {
+		return errors.New(commonModel.INVALID_PARAMS)
+	}
+
+	wa, err := userService.newWebAuthn(rpID, origin)
+	if err != nil {
+		return err
+	}
+
+	wUser, _, err := userService.getWebauthnUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	req, _ := http.NewRequest("POST", "http://localhost/passkey/register/finish", bytes.NewReader(credential))
+	req.Header.Set("Content-Type", "application/json")
+
+	cred, err := wa.FinishRegistration(wUser, sess.Session, req)
+	if err != nil {
+		return err
+	}
+
+	credID := base64.RawURLEncoding.EncodeToString(cred.ID)
+	credJSON, _ := json.Marshal(cred)
+	publicKey := base64.RawURLEncoding.EncodeToString(cred.PublicKey)
+	aaguid := base64.RawURLEncoding.EncodeToString(cred.Authenticator.AAGUID)
+
+	passkey := authModel.Passkey{
+		UserID:         userID,
+		CredentialID:   credID,
+		CredentialJSON: string(credJSON),
+		PublicKey:      publicKey,
+		SignCount:      cred.Authenticator.SignCount,
+		LastUsedAt:     time.Now(),
+		DeviceName:     sess.DeviceName,
+		AAGUID:         aaguid,
+	}
+
+	return userService.txManager.Run(func(ctx context.Context) error {
+		return userService.userRepository.CreatePasskey(ctx, &passkey)
+	})
+}
+
+func (userService *UserService) PasskeyLoginBegin(rpID, origin string) (authModel.PasskeyLoginBeginResp, error) {
+	var resp authModel.PasskeyLoginBeginResp
+
+	wa, err := userService.newWebAuthn(rpID, origin)
+	if err != nil {
+		return resp, err
+	}
+
+	assertion, session, err := wa.BeginDiscoverableLogin(
+		webauthn.WithUserVerification(protocol.VerificationPreferred),
+	)
+	if err != nil {
+		return resp, err
+	}
+
+	nonce, err := newNonce()
+	if err != nil {
+		return resp, err
+	}
+
+	userService.userRepository.CacheSetPasskeySession(
+		repository.GetPasskeyLoginSessionKey(nonce),
+		passkeySessionCache{
+			Session: *session,
+			Origin:  origin,
+		},
+		passkeySessionTTL,
+	)
+
+	resp.Nonce = nonce
+	resp.PublicKey = &assertion.Response
+	return resp, nil
+}
+
+func (userService *UserService) PasskeyLoginFinish(rpID, origin, nonce string, credential json.RawMessage) (string, error) {
+	cacheKey := repository.GetPasskeyLoginSessionKey(nonce)
+	cached, err := userService.userRepository.CacheGetPasskeySession(cacheKey)
+	if err != nil {
+		return "", errors.New(commonModel.INVALID_PARAMS)
+	}
+	// 一次性使用
+	userService.userRepository.CacheDeletePasskeySession(cacheKey)
+
+	sess, ok := cached.(passkeySessionCache)
+	if !ok {
+		return "", errors.New(commonModel.INVALID_PARAMS)
+	}
+	if sess.Origin != origin {
+		return "", errors.New(commonModel.INVALID_PARAMS)
+	}
+
+	wa, err := userService.newWebAuthn(rpID, origin)
+	if err != nil {
+		return "", err
+	}
+
+	req, _ := http.NewRequest("POST", "http://localhost/passkey/login/finish", bytes.NewReader(credential))
+	req.Header.Set("Content-Type", "application/json")
+
+	handler := func(rawID, userHandle []byte) (webauthn.User, error) {
+		credID := base64.RawURLEncoding.EncodeToString(rawID)
+		pk, err := userService.userRepository.GetPasskeyByCredentialID(credID)
+		if err != nil {
+			return nil, err
+		}
+
+		expected := makeUserHandle(pk.UserID)
+		if len(userHandle) > 0 && !bytes.Equal(userHandle, expected) {
+			return nil, errors.New(commonModel.INVALID_PARAMS)
+		}
+
+		wUser, _, err := userService.getWebauthnUserByID(pk.UserID)
+		if err != nil {
+			return nil, err
+		}
+		return wUser, nil
+	}
+
+	user, credentialObj, err := wa.FinishPasskeyLogin(handler, sess.Session, req)
+	if err != nil {
+		return "", err
+	}
+
+	uid := userIDFromHandle(user.WebAuthnID())
+	if uid == 0 {
+		// fallback：根据 credentialID 再查一次
+		credID := base64.RawURLEncoding.EncodeToString(credentialObj.ID)
+		pk, err2 := userService.userRepository.GetPasskeyByCredentialID(credID)
+		if err2 != nil {
+			return "", err
+		}
+		uid = pk.UserID
+	}
+
+	// 更新计数器 & 最近使用时间
+	credID := base64.RawURLEncoding.EncodeToString(credentialObj.ID)
+	pk, err := userService.userRepository.GetPasskeyByCredentialID(credID)
+	if err == nil {
+		_ = userService.txManager.Run(func(ctx context.Context) error {
+			return userService.userRepository.UpdatePasskeyUsage(ctx, pk.ID, credentialObj.Authenticator.SignCount, time.Now())
+		})
+	}
+
+	u, err := userService.userRepository.GetUserByID(int(uid))
+	if err != nil {
+		return "", err
+	}
+
+	token, err := jwtUtil.GenerateToken(jwtUtil.CreateClaims(u))
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func (userService *UserService) ListPasskeys(userID uint) ([]authModel.PasskeyDeviceDto, error) {
+	passkeys, err := userService.userRepository.ListPasskeysByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	devs := make([]authModel.PasskeyDeviceDto, 0, len(passkeys))
+	for _, pk := range passkeys {
+		devs = append(devs, authModel.PasskeyDeviceDto{
+			ID:         pk.ID,
+			DeviceName: pk.DeviceName,
+			AAGUID:     pk.AAGUID,
+			LastUsedAt: pk.LastUsedAt,
+			CreatedAt:  pk.CreatedAt,
+		})
+	}
+	return devs, nil
+}
+
+func (userService *UserService) DeletePasskey(userID, passkeyID uint) error {
+	return userService.txManager.Run(func(ctx context.Context) error {
+		return userService.userRepository.DeletePasskeyByID(ctx, userID, passkeyID)
+	})
+}
+
+func (userService *UserService) UpdatePasskeyDeviceName(userID, passkeyID uint, deviceName string) error {
+	if strings.TrimSpace(deviceName) == "" {
+		return errors.New(commonModel.INVALID_PARAMS_BODY)
+	}
+	return userService.txManager.Run(func(ctx context.Context) error {
+		return userService.userRepository.UpdatePasskeyDeviceName(ctx, userID, passkeyID, deviceName)
+	})
 }

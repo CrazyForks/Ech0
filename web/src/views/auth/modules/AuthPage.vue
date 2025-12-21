@@ -34,6 +34,15 @@
             class="rounded-md w-9 h-9"
           />
           <div class="flex items-center">
+            <!-- Passkey 登录（Resident Key / 无用户名） -->
+            <BaseButton
+              v-if="passkeySupported"
+              @click="handlePasskeyLogin"
+              class="w-20 h-9 rounded-md mr-2"
+              title="使用 Passkey 登录"
+            >
+              <span class="text-[var(--text-color-next-500)] text-xs">Passkey</span>
+            </BaseButton>
             <!-- OAuth2 登录 -->
             <BaseButton
               v-if="oauth2Status && oauth2Status.enabled"
@@ -104,11 +113,14 @@ import QQ from '@/components/icons/qq.vue'
 import Customoauth from '@/components/icons/customoauth.vue'
 import { fetchGetOAuth2Status } from '@/service/api'
 import { OAuth2Provider } from '@/enums/enums'
+import { fetchPasskeyLoginBegin, fetchPasskeyLoginFinish } from '@/service/api'
+import { theToast } from '@/utils/toast'
 
 const AuthMode = ref<'login' | 'register'>('login') // login / register
 const username = ref<string>('')
 const password = ref<string>('')
 const userStore = useUserStore()
+const passkeySupported = !!(window.PublicKeyCredential && navigator.credentials)
 
 const oauth2Status = ref<App.Api.Setting.OAuth2Status | null>(null)
 const baseURL =
@@ -139,6 +151,96 @@ const handleLogin = async () => {
     username: username.value,
     password: password.value,
   })
+}
+
+function base64urlToUint8Array(input: string) {
+  const base64 = input.replace(/-/g, '+').replace(/_/g, '/')
+  const pad = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4))
+  const binary = atob(base64 + pad)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
+
+function uint8ArrayToBase64url(bytes: ArrayBuffer | Uint8Array) {
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
+  let binary = ''
+  for (let i = 0; i < u8.length; i++) binary += String.fromCharCode(u8[i]!)
+  const base64 = btoa(binary)
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+}
+
+type RequestOptionsJSON = Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> & {
+  challenge: string
+  allowCredentials?: Array<{
+    type: PublicKeyCredentialType
+    id: string
+    transports?: AuthenticatorTransport[]
+  }>
+}
+
+function normalizeRequestOptions(raw: unknown): PublicKeyCredentialRequestOptions {
+  if (!raw || typeof raw !== 'object') throw new Error('服务端返回的 publicKey 不合法')
+  const o = raw as RequestOptionsJSON
+  const { challenge, allowCredentials, ...rest } = o
+
+  const allow = Array.isArray(allowCredentials)
+    ? allowCredentials.map((c) => ({
+        ...c,
+        id: base64urlToUint8Array(c.id),
+      }))
+    : undefined
+
+  return {
+    ...rest,
+    challenge: base64urlToUint8Array(challenge),
+    ...(allow ? { allowCredentials: allow } : {}),
+  }
+}
+
+function credentialToJSON(cred: PublicKeyCredential) {
+  const obj: Record<string, unknown> = {
+    id: cred.id,
+    rawId: uint8ArrayToBase64url(cred.rawId),
+    type: cred.type,
+    clientExtensionResults: cred.getClientExtensionResults?.() ?? {},
+  }
+
+  const response: Record<string, unknown> = {}
+  response.clientDataJSON = uint8ArrayToBase64url(cred.response.clientDataJSON)
+
+  if ('authenticatorData' in cred.response) {
+    const r = cred.response as AuthenticatorAssertionResponse
+    response.authenticatorData = uint8ArrayToBase64url(r.authenticatorData)
+    response.signature = uint8ArrayToBase64url(r.signature)
+    if (r.userHandle && r.userHandle.byteLength > 0) {
+      response.userHandle = uint8ArrayToBase64url(r.userHandle)
+    }
+  }
+
+  obj.response = response
+  return obj
+}
+
+const handlePasskeyLogin = async () => {
+  if (!passkeySupported) return
+  try {
+    const begin = await fetchPasskeyLoginBegin()
+    if (begin.code !== 1) return
+
+    const options = normalizeRequestOptions(begin.data.publicKey)
+    const got = await navigator.credentials.get({ publicKey: options })
+    if (!got) throw new Error('获取凭证失败')
+    const cred = got as PublicKeyCredential
+
+    const finish = await fetchPasskeyLoginFinish(begin.data.nonce, credentialToJSON(cred))
+    if (finish.code !== 1) return
+
+    await userStore.loginWithToken(finish.data)
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Passkey 登录失败'
+    theToast.error(msg)
+  }
 }
 
 const handleRegister = async () => {

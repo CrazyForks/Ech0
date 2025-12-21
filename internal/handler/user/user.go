@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -623,5 +625,158 @@ func (userHandler *UserHandler) GetOAuthInfo() gin.HandlerFunc {
 			Data: oauthInfo,
 			Msg:  commonModel.GET_OAUTH_INFO_SUCCESS,
 		}
+	})
+}
+
+func getOriginAndRPID(ctx *gin.Context) (origin string, rpID string) {
+	origin = strings.TrimSpace(ctx.GetHeader("Origin"))
+	if origin == "" {
+		// fallback：尽量从 Referer 推导；再不行用 scheme+Host
+		ref := strings.TrimSpace(ctx.GetHeader("Referer"))
+		if ref != "" {
+			if u, err := url.Parse(ref); err == nil && u.Scheme != "" && u.Host != "" {
+				origin = u.Scheme + "://" + u.Host
+			}
+		}
+		if origin == "" {
+			scheme := "http"
+			if ctx.Request.TLS != nil {
+				scheme = "https"
+			}
+			origin = scheme + "://" + ctx.Request.Host
+		}
+	}
+
+	if u, err := url.Parse(origin); err == nil {
+		if h := u.Hostname(); h != "" {
+			rpID = h
+		}
+	}
+	if rpID == "" {
+		host := ctx.Request.Host
+		if strings.Contains(host, ":") {
+			host = strings.Split(host, ":")[0]
+		}
+		rpID = host
+	}
+	return origin, rpID
+}
+
+// PasskeyLoginBegin 开始 Passkey 登录（discoverable / resident key）
+func (userHandler *UserHandler) PasskeyLoginBegin() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		origin, rpID := getOriginAndRPID(ctx)
+
+		data, err := userHandler.userService.PasskeyLoginBegin(rpID, origin)
+		if err != nil {
+			return res.Response{Err: err}
+		}
+		return res.Response{Data: data}
+	})
+}
+
+// PasskeyLoginFinish 完成 Passkey 登录
+func (userHandler *UserHandler) PasskeyLoginFinish() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		var req authModel.PasskeyFinishReq
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			return res.Response{Msg: commonModel.INVALID_REQUEST_BODY, Err: err}
+		}
+		origin, rpID := getOriginAndRPID(ctx)
+
+		token, err := userHandler.userService.PasskeyLoginFinish(rpID, origin, req.Nonce, req.Credential)
+		if err != nil {
+			return res.Response{Err: err}
+		}
+		return res.Response{Data: token}
+	})
+}
+
+// PasskeyRegisterBegin 开始 Passkey 绑定（仅已登录用户）
+func (userHandler *UserHandler) PasskeyRegisterBegin() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		userid := ctx.MustGet("userid").(uint)
+
+		var req authModel.PasskeyRegisterBeginReq
+		_ = ctx.ShouldBindJSON(&req) // device_name 可选
+
+		origin, rpID := getOriginAndRPID(ctx)
+		data, err := userHandler.userService.PasskeyRegisterBegin(userid, rpID, origin, req.DeviceName)
+		if err != nil {
+			return res.Response{Err: err}
+		}
+		return res.Response{Data: data}
+	})
+}
+
+// PasskeyRegisterFinish 完成 Passkey 绑定
+func (userHandler *UserHandler) PasskeyRegisterFinish() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		userid := ctx.MustGet("userid").(uint)
+
+		var req authModel.PasskeyFinishReq
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			return res.Response{Msg: commonModel.INVALID_REQUEST_BODY, Err: err}
+		}
+
+		origin, rpID := getOriginAndRPID(ctx)
+		if err := userHandler.userService.PasskeyRegisterFinish(userid, rpID, origin, req.Nonce, req.Credential); err != nil {
+			return res.Response{Err: err}
+		}
+
+		return res.Response{}
+	})
+}
+
+// ListPasskeys 获取当前用户已绑定的 Passkey 设备列表
+func (userHandler *UserHandler) ListPasskeys() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		userid := ctx.MustGet("userid").(uint)
+		devs, err := userHandler.userService.ListPasskeys(userid)
+		if err != nil {
+			return res.Response{Err: err}
+		}
+		return res.Response{Data: devs}
+	})
+}
+
+// DeletePasskey 删除当前用户某个 Passkey 设备
+func (userHandler *UserHandler) DeletePasskey() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		userid := ctx.MustGet("userid").(uint)
+
+		idStr := ctx.Param("id")
+		id, err := strconv.ParseUint(idStr, 10, 64)
+		if err != nil {
+			return res.Response{Msg: commonModel.INVALID_PARAMS, Err: err}
+		}
+
+		if err := userHandler.userService.DeletePasskey(userid, uint(id)); err != nil {
+			return res.Response{Err: err}
+		}
+		return res.Response{}
+	})
+}
+
+// UpdatePasskeyDeviceName 更新 Passkey 设备名称
+func (userHandler *UserHandler) UpdatePasskeyDeviceName() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		userid := ctx.MustGet("userid").(uint)
+
+		idStr := ctx.Param("id")
+		id, err := strconv.ParseUint(idStr, 10, 64)
+		if err != nil {
+			return res.Response{Msg: commonModel.INVALID_PARAMS, Err: err}
+		}
+
+		var req authModel.PasskeyUpdateDeviceNameReq
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			return res.Response{Msg: commonModel.INVALID_REQUEST_BODY, Err: err}
+		}
+
+		if err := userHandler.userService.UpdatePasskeyDeviceName(userid, uint(id), req.DeviceName); err != nil {
+			return res.Response{Err: err}
+		}
+		return res.Response{}
 	})
 }

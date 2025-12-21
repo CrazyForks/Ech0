@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -261,4 +262,68 @@ func (userRepository *UserRepository) GetOAuthOIDCInfo(userId uint, provider str
 		return model.OAuthBinding{}, err
 	}
 	return oauthInfo, nil
+}
+
+// -----------------------
+// Passkey / WebAuthn
+// -----------------------
+
+func (userRepository *UserRepository) CreatePasskey(ctx context.Context, passkey *authModel.Passkey) error {
+	return userRepository.getDB(ctx).Create(passkey).Error
+}
+
+func (userRepository *UserRepository) ListPasskeysByUserID(userID uint) ([]authModel.Passkey, error) {
+	var passkeys []authModel.Passkey
+	if err := userRepository.db().
+		Where("user_id = ?", userID).
+		Order("id desc").
+		Find(&passkeys).Error; err != nil {
+		return nil, err
+	}
+	return passkeys, nil
+}
+
+func (userRepository *UserRepository) GetPasskeyByCredentialID(credentialID string) (authModel.Passkey, error) {
+	var passkey authModel.Passkey
+	if err := userRepository.db().
+		Where("credential_id = ?", credentialID).
+		First(&passkey).Error; err != nil {
+		return authModel.Passkey{}, err
+	}
+	return passkey, nil
+}
+
+func (userRepository *UserRepository) UpdatePasskeyUsage(ctx context.Context, passkeyID uint, signCount uint32, lastUsedAt time.Time) error {
+	return userRepository.getDB(ctx).
+		Model(&authModel.Passkey{}).
+		Where("id = ?", passkeyID).
+		Updates(map[string]any{
+			"sign_count":   signCount,
+			"last_used_at": lastUsedAt,
+		}).Error
+}
+
+func (userRepository *UserRepository) UpdatePasskeyDeviceName(ctx context.Context, userID, passkeyID uint, deviceName string) error {
+	return userRepository.getDB(ctx).
+		Model(&authModel.Passkey{}).
+		Where("id = ? AND user_id = ?", passkeyID, userID).
+		Update("device_name", deviceName).Error
+}
+
+func (userRepository *UserRepository) DeletePasskeyByID(ctx context.Context, userID, passkeyID uint) error {
+	return userRepository.getDB(ctx).
+		Where("id = ? AND user_id = ?", passkeyID, userID).
+		Delete(&authModel.Passkey{}).Error
+}
+
+func (userRepository *UserRepository) CacheSetPasskeySession(key string, val any, ttl time.Duration) {
+	_ = userRepository.cache.SetWithTTL(key, val, 1, ttl)
+}
+
+func (userRepository *UserRepository) CacheGetPasskeySession(key string) (any, error) {
+	return userRepository.cache.Get(key)
+}
+
+func (userRepository *UserRepository) CacheDeletePasskeySession(key string) {
+	userRepository.cache.Delete(key)
 }
