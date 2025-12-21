@@ -353,7 +353,7 @@ const OAuth2ProviderOptions = [
   { label: 'GitHub', value: OAuth2Provider.GITHUB },
   { label: 'Google', value: OAuth2Provider.GOOGLE },
   // { label: 'QQ', value: OAuth2Provider.QQ },
-  { label: 'Custom', value: OAuth2Provider.CUSTOM },
+  { label: 'Custom(支持 OIDC)', value: OAuth2Provider.CUSTOM },
 ]
 
 const redirect_uri = ref<string>(OAuth2Setting.value.redirect_uri)
