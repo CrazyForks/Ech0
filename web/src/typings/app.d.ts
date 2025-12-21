@@ -230,6 +230,10 @@ declare namespace App {
         auth_url: string
         token_url: string
         user_info_url: string
+
+        is_oidc: boolean
+        issuer: string
+        jwks_url: string
       }
 
       type OAuth2Status = {

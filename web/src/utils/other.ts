@@ -173,7 +173,7 @@ export const extractAndCleanMusicURL = (input: string): string | null => {
         // 使用统一的歌单路径格式
         return `https://y.qq.com/n/ryqq_v2/playlist/${parsed.id}`
       }
-      
+
       // 如果是其他未知类型，则返回 null
       return null
     }

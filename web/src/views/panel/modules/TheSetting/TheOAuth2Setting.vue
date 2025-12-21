@@ -194,6 +194,61 @@
             @blur="OAuth2Setting.scopes = scopeString.split(',').map((s) => s.trim())"
           />
         </div>
+
+        <!-- Is OIDC -->
+        <div
+          v-if="OAuth2Setting.enable"
+          class="flex flex-row items-center justify-start text-[var(--text-color-next-500)] h-10"
+        >
+          <h2 class="font-semibold w-30 shrink-0">启用OIDC:</h2>
+          <BaseSwitch v-model="OAuth2Setting.is_oidc" :disabled="!oauth2EditMode" />
+        </div>
+
+        <!-- Issuer -->
+        <div
+          v-if="OAuth2Setting.is_oidc"
+          class="flex flex-row items-center justify-start text-[var(--text-color-next-500)] gap-2 h-10"
+        >
+          <h2 class="font-semibold w-30 shrink-0">Issuer:</h2>
+          <span
+            v-if="!oauth2EditMode"
+            class="truncate max-w-40 inline-block align-middle"
+            :title="OAuth2Setting.issuer"
+            style="vertical-align: middle"
+          >
+            {{ OAuth2Setting.issuer.length === 0 ? '暂无' : OAuth2Setting.issuer }}
+          </span>
+          <BaseInput
+            v-else
+            v-model="OAuth2Setting.issuer"
+            type="text"
+            placeholder="请输入Issuer"
+            class="w-full py-1!"
+          />
+        </div>
+
+        <!-- JWKS URL -->
+        <div
+          v-if="OAuth2Setting.is_oidc"
+          class="flex flex-row items-center justify-start text-[var(--text-color-next-500)] gap-2 h-10"
+        >
+          <h2 class="font-semibold w-30 shrink-0">JWKS URL:</h2>
+          <span
+            v-if="!oauth2EditMode"
+            class="truncate max-w-40 inline-block align-middle"
+            :title="OAuth2Setting.jwks_url"
+            style="vertical-align: middle"
+          >
+            {{ OAuth2Setting.jwks_url.length === 0 ? '暂无' : OAuth2Setting.jwks_url }}
+          </span>
+          <BaseInput
+            v-else
+            v-model="OAuth2Setting.jwks_url"
+            type="text"
+            placeholder="请输入JWKS URL"
+            class="w-full py-1!"
+          />
+        </div>
       </div>
     </PanelCard>
 
