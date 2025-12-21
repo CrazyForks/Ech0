@@ -245,6 +245,8 @@ declare namespace App {
         provider: string
         user_id: number
         oauth_id: string
+        issuer: string
+        auth_type: string
       }
 
       type FediverseSetting = {

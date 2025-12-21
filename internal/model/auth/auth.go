@@ -19,6 +19,7 @@ const (
 )
 
 type OAuth2Action string
+type AuthType string
 
 const (
 	// OAuth2ActionLogin 表示登录操作
@@ -27,6 +28,9 @@ const (
 	OAuth2ActionRegister OAuth2Action = "register"
 	// OAuth2ActionBind 表示绑定操作
 	OAuth2ActionBind OAuth2Action = "bind"
+
+	AuthTypeOAuth2 AuthType = "oauth2"
+	AuthTypeOIDC   AuthType = "oidc"
 )
 
 type OAuthState struct {

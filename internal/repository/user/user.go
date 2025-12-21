@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/lin-snow/ech0/internal/cache"
+	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	model "github.com/lin-snow/ech0/internal/model/user"
 	"github.com/lin-snow/ech0/internal/transaction"
 )
@@ -159,18 +160,33 @@ func (userRepository *UserRepository) DeleteUser(ctx context.Context, id uint) e
 	return nil
 }
 
-// BindOAuth 绑定 OAuth 账号
-func (userRepository *UserRepository) BindOAuth(ctx context.Context, userID uint, provider, oauthID string) error {
-	// 检查是否已绑定
+// BindOAuth 绑定 OAuth 或 OIDC 账号
+func (userRepository *UserRepository) BindOAuth(ctx context.Context, userID uint, provider, oauthID, issuer, authType string) error {
+	// 检查是否已绑定(可能是 OAuth2 或 OIDC)
 	var existing model.OAuthBinding
-	err := userRepository.getDB(ctx).Where("user_id = ? AND provider = ?", userID, provider).First(&existing).Error
-	if err == nil {
-		// 已绑定，更新 oauth_id
-		existing.OAuthID = oauthID
-		return userRepository.getDB(ctx).Save(&existing).Error
-	}
-	if err != gorm.ErrRecordNotFound {
-		return err
+	if authType == string(authModel.AuthTypeOIDC) {
+		// 查出 OIDC 绑定 (auth_type 为 oidc)
+		err := userRepository.getDB(ctx).Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userID, provider, issuer, string(authModel.AuthTypeOIDC)).First(&existing).Error
+		if err == nil {
+			// 已绑定，更新 oauth_id
+			existing.OAuthID = oauthID
+			return userRepository.getDB(ctx).Save(&existing).Error
+		}
+		if err != gorm.ErrRecordNotFound {
+			return err
+		}
+	} else {
+		// 查出 OAuth2 绑定 (auth_type 为空或 oauth2) && issuer 为空或 issuer 为 ""
+		err := userRepository.getDB(ctx).Where("user_id = ? AND provider = ? AND (issuer IS NULL OR issuer = ?) AND (auth_type = ? OR auth_type IS NULL)", userID, provider, "", string(authModel.AuthTypeOAuth2)).First(&existing).Error
+		if err == nil {
+			// 已绑定，更新 oauth_id
+			existing.OAuthID = oauthID
+			existing.AuthType = string(authModel.AuthTypeOAuth2)
+			return userRepository.getDB(ctx).Save(&existing).Error
+		}
+		if err != gorm.ErrRecordNotFound {
+			return err
+		}
 	}
 
 	// 未绑定，创建新记录
@@ -178,6 +194,8 @@ func (userRepository *UserRepository) BindOAuth(ctx context.Context, userID uint
 		UserID:   userID,
 		Provider: provider,
 		OAuthID:  oauthID,
+		Issuer:   issuer,
+		AuthType: authType,
 	}
 	if err := userRepository.getDB(ctx).Create(&newBinding).Error; err != nil {
 		return err
@@ -203,10 +221,22 @@ func (userRepository *UserRepository) GetUserByOAuthID(
 // GetOAuthInfo 获取 OAuth2 信息
 func (userRepository *UserRepository) GetOAuthInfo(userId uint, provider string) (model.OAuthBinding, error) {
 	var oauthInfo model.OAuthBinding
-	err := userRepository.db().Where("user_id = ? AND provider = ?", userId, provider).First(&oauthInfo).Error
+	err := userRepository.db().
+		Where("user_id = ? AND provider = ? AND (auth_type = ? OR auth_type IS NULL)", userId, provider, "oauth").
+		First(&oauthInfo).Error
 	if err != nil {
 		return model.OAuthBinding{}, err
 	}
 
+	return oauthInfo, nil
+}
+
+// GetOAuthOIDCInfo 获取 OIDC 信息
+func (userRepository *UserRepository) GetOAuthOIDCInfo(userId uint, provider string, issuer string) (model.OAuthBinding, error) {
+	var oauthInfo model.OAuthBinding
+	err := userRepository.db().Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userId, provider, issuer, "oidc").First(&oauthInfo).Error
+	if err != nil {
+		return model.OAuthBinding{}, err
+	}
 	return oauthInfo, nil
 }

@@ -402,7 +402,7 @@ func (userService *UserService) GetUserByID(userId int) (model.User, error) {
 	return userService.userRepository.GetUserByID(userId)
 }
 
-// BindOAuth 绑定 OAuth2 账号
+// BindOAuth 绑定 OAuth2 账号(支持 OAuth2 和 OIDC)
 func (userService *UserService) BindOAuth(userID uint, provider string, redirectURI string) (string, error) {
 	user, err := userService.userRepository.GetUserByID(int(userID))
 	if err != nil {
@@ -418,7 +418,7 @@ func (userService *UserService) BindOAuth(userID uint, provider string, redirect
 		return "", err
 	}
 
-	state, err := jwtUtil.GenerateOAuthState(
+	state, nonce, err := jwtUtil.GenerateOAuthState(
 		string(authModel.OAuth2ActionBind),
 		userID,
 		redirectURI,
@@ -428,7 +428,7 @@ func (userService *UserService) BindOAuth(userID uint, provider string, redirect
 		return "", err
 	}
 
-	authorizeURL := userService.buildOAuthAuthorizeURL(setting, provider, state)
+	authorizeURL := userService.buildOAuthAuthorizeURL(setting, provider, state, nonce)
 	if authorizeURL == "" {
 		return "", errors.New(commonModel.OAUTH2_NOT_CONFIGURED)
 	}
@@ -443,7 +443,7 @@ func (userService *UserService) GetOAuthLoginURL(provider string, redirectURI st
 		return "", err
 	}
 
-	state, err := jwtUtil.GenerateOAuthState(
+	state, nonce, err := jwtUtil.GenerateOAuthState(
 		string(authModel.OAuth2ActionLogin),
 		authModel.NO_USER_LOGINED,
 		redirectURI,
@@ -453,7 +453,7 @@ func (userService *UserService) GetOAuthLoginURL(provider string, redirectURI st
 		return "", err
 	}
 
-	authorizeURL := userService.buildOAuthAuthorizeURL(setting, provider, state)
+	authorizeURL := userService.buildOAuthAuthorizeURL(setting, provider, state, nonce)
 	if authorizeURL == "" {
 		return "", errors.New(commonModel.OAUTH2_NOT_CONFIGURED)
 	}
@@ -491,7 +491,7 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, fmt.Sprint(githubUser.ID))
+		return userService.resolveOAuthCallback(oauthState, provider, fmt.Sprint(githubUser.ID), "", string(authModel.AuthTypeOAuth2))
 
 	case string(commonModel.OAuth2GOOGLE):
 		tokenResp, err := exchangeGoogleCodeForToken(setting, code)
@@ -506,7 +506,7 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, googleUser.Sub)
+		return userService.resolveOAuthCallback(oauthState, provider, googleUser.Sub, "", string(authModel.AuthTypeOAuth2))
 
 	case string(commonModel.OAuth2QQ):
 		tokenResp, err := exchangeQQCodeForToken(setting, code)
@@ -521,22 +521,40 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, qqOpenIDResp.OpenID)
+		return userService.resolveOAuthCallback(oauthState, provider, qqOpenIDResp.OpenID, "", string(authModel.AuthTypeOAuth2))
 
 	case string(commonModel.OAuth2CUSTOM):
-		accessToken, err := exchangeCustomCodeForToken(setting, code)
+		// 使用 code 换取 access_token
+		accessToken, idToken, err := exchangeCustomCodeForToken(setting, code)
 		if err != nil {
 			fmt.Printf("Error exchanging %s code for token: %v\n", provider, err)
 			return ""
 		}
 
-		customUserID, err := fetchCustomUserInfo(setting, accessToken)
-		if err != nil {
-			fmt.Printf("Error fetching %s user info: %v\n", provider, err)
-			return ""
+		var oauthId string
+		var authType string
+		var issuer string
+
+		if setting.IsOIDC {
+			oauthId, err = fetchCustomUserInfo(setting, accessToken, idToken)
+			if err != nil {
+				fmt.Printf("Error fetching %s user info: %v\n", provider, err)
+				return ""
+			}
+			issuer = setting.Issuer
+			authType = string(authModel.AuthTypeOIDC)
+		} else {
+			oauthId, err = fetchCustomUserInfo(setting, accessToken, "")
+			if err != nil {
+				fmt.Printf("Error fetching %s user info: %v\n", provider, err)
+				return ""
+			}
+			issuer = ""
+			authType = string(authModel.AuthTypeOAuth2)
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, customUserID)
+		// 绑定到本地用户并返回重定向 URL
+		return userService.resolveOAuthCallback(oauthState, provider, oauthId, issuer, authType)
 
 	default:
 		return ""
@@ -567,11 +585,14 @@ func (userService *UserService) getOAuthSetting(provider string) (*settingModel.
 
 func (userService *UserService) buildOAuthAuthorizeURL(
 	setting *settingModel.OAuth2Setting,
-	provider, state string,
+	provider, state, nonce string,
 ) string {
 	scope := ""
 	if len(setting.Scopes) > 0 {
 		scope = strings.Join(setting.Scopes, " ")
+	}
+	if setting.IsOIDC {
+		scope = "openid " + scope // 强制加入 openid 范围
 	}
 
 	switch provider {
@@ -610,6 +631,7 @@ func (userService *UserService) buildOAuthAuthorizeURL(
 		}
 		return fmt.Sprintf("%s?%s", setting.AuthURL, params.Encode())
 
+	// 自定义 OAuth2 （仅 Custom 类型支持 OIDC)
 	case string(commonModel.OAuth2CUSTOM):
 		params := url.Values{}
 		params.Set("client_id", setting.ClientID)
@@ -618,6 +640,9 @@ func (userService *UserService) buildOAuthAuthorizeURL(
 		params.Set("state", state)
 		if scope != "" {
 			params.Set("scope", scope)
+		}
+		if setting.IsOIDC && nonce != "" {
+			params.Set("nonce", nonce)
 		}
 
 		return fmt.Sprintf("%s?%s", setting.AuthURL, params.Encode())
@@ -643,7 +668,7 @@ func bindingPermissionError(provider string) error {
 
 func (userService *UserService) resolveOAuthCallback(
 	oauthState *authModel.OAuthState,
-	provider, externalID string,
+	provider, externalID, issuer, authType string,
 ) string {
 	switch oauthState.Action {
 	case string(authModel.OAuth2ActionLogin):
@@ -683,7 +708,7 @@ func (userService *UserService) resolveOAuthCallback(
 		}
 
 		_ = userService.txManager.Run(func(ctx context.Context) error {
-			return userService.userRepository.BindOAuth(ctx, oauthState.UserID, provider, externalID)
+			return userService.userRepository.BindOAuth(ctx, oauthState.UserID, provider, externalID, issuer, authType)
 		})
 
 		return oauthState.Redirect + "?bind=success"
@@ -894,7 +919,7 @@ func fetchQQUserInfo(accessToken string) (*authModel.QQOpenIDResponse, error) {
 }
 
 // exchangeCustomCodeForToken 通用 OAuth2 令牌交换
-func exchangeCustomCodeForToken(setting *settingModel.OAuth2Setting, code string) (string, error) {
+func exchangeCustomCodeForToken(setting *settingModel.OAuth2Setting, code string) (accessToken string, idToken string, err error) {
 	data := url.Values{}
 	data.Set("client_id", setting.ClientID)
 	data.Set("client_secret", setting.ClientSecret)
@@ -908,31 +933,59 @@ func exchangeCustomCodeForToken(setting *settingModel.OAuth2Setting, code string
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return "", errors.New("Custom token 响应错误: " + string(body))
+		return "", "", errors.New("Custom token 响应错误: " + string(body))
 	}
 
 	var tokenResp map[string]any
 	if err := json.Unmarshal(body, &tokenResp); err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	if accessToken, ok := tokenResp["access_token"]; ok {
-		if tokenStr := fmt.Sprint(accessToken); tokenStr != "" && tokenStr != "<nil>" {
-			return tokenStr, nil
+	// 获取 access_token
+	if at, ok := tokenResp["access_token"]; ok {
+		accessToken = fmt.Sprint(at)
+	}
+	if accessToken == "" {
+		return "", "", errors.New("custom token 响应缺少 access_token")
+	}
+
+	// OIDC 情况获取 id_token
+	if setting.IsOIDC {
+		if it, ok := tokenResp["id_token"]; ok {
+			idToken = fmt.Sprint(it)
+		}
+		if idToken == "" {
+			return "", "", errors.New("OIDC 响应缺少 id_token")
 		}
 	}
 
-	return "", errors.New("custom token 响应缺少 access_token")
+	return accessToken, idToken, nil
 }
 
 // fetchCustomUserInfo 获取自定义 OAuth2 用户信息
-func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken string) (string, error) {
+func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken, idToken string) (string, error) {
+	// OIDC: 直接使用 id_token 中的 sub 字段
+	if setting.IsOIDC {
+		if idToken == "" {
+			return "", errors.New("OIDC id_token is empty")
+		}
+
+		// 校验并解析 id_token
+		claims, err := jwtUtil.ParseAndVerifyIDToken(idToken, setting.Issuer, setting.JWKSURL, setting.ClientID)
+		if err != nil {
+			return "", err
+		}
+
+		return claims["sub"].(string), nil
+	}
+
+	// OAuth2: 通过 UserInfo Endpoint 获取唯一 ID
 	req, _ := http.NewRequest("GET", setting.UserInfoURL, nil)
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Accept", "application/json")
@@ -979,15 +1032,38 @@ func (userService *UserService) GetOAuthInfo(userId uint, provider string) (mode
 		return oauthInfo, bindingPermissionError(provider)
 	}
 
-	oauthInfoBinding, err := userService.userRepository.GetOAuthInfo(userId, provider)
-	if err != nil {
+	// 获取 OAuth2 设置
+	var oauth2Setting settingModel.OAuth2Setting
+	if err := userService.settingService.GetOAuth2Setting(user.ID, &oauth2Setting, true); err != nil {
 		return oauthInfo, err
+	}
+	isOIDC := oauth2Setting.IsOIDC
+	issuer := oauth2Setting.Issuer
+	authType := "oauth"
+	if isOIDC {
+		authType = "oidc"
+	}
+
+	// 获取绑定信息
+	var oauthInfoBinding model.OAuthBinding
+	if isOIDC {
+		oauthInfoBinding, err = userService.userRepository.GetOAuthOIDCInfo(user.ID, provider, issuer)
+		if err != nil {
+			return oauthInfo, err
+		}
+	} else {
+		oauthInfoBinding, err = userService.userRepository.GetOAuthInfo(user.ID, provider)
+		if err != nil {
+			return oauthInfo, err
+		}
 	}
 
 	oauthInfo = model.OAuthInfoDto{
 		Provider: oauthInfoBinding.Provider,
 		UserID:   oauthInfoBinding.UserID,
 		OAuthID:  oauthInfoBinding.OAuthID,
+		Issuer:   issuer,
+		AuthType: authType,
 	}
 
 	return oauthInfo, nil

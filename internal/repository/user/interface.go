@@ -29,11 +29,14 @@ type UserRepositoryInterface interface {
 	DeleteUser(ctx context.Context, id uint) error
 
 	// BindOAuth 绑定 OAuth 账号
-	BindOAuth(ctx context.Context, userID uint, provider, oauthID string) error
+	BindOAuth(ctx context.Context, userID uint, provider, oauthID, issuer, authType string) error
 
 	// GetUserByOAuthID 根据 OAuth 提供商和 OAuth ID 获取用户
 	GetUserByOAuthID(ctx context.Context, provider, oauthID string) (model.User, error)
 
 	// GetOAuthInfo 获取 OAuth2 信息
 	GetOAuthInfo(userId uint, provider string) (model.OAuthBinding, error)
+
+	// GetOAuthOIDCInfo 获取 OIDC 信息
+	GetOAuthOIDCInfo(userId uint, provider string, issuer string) (model.OAuthBinding, error)
 }
