@@ -443,14 +443,14 @@ function getProviderTemplate(provider: string) {
       scopes: ['get_user_info'],
     }
   } else if (provider === String(OAuth2Provider.CUSTOM)) {
-    scopeString.value = ''
+    scopeString.value = 'openid'
     redirect_uri.value = `${window.location.origin}/oauth/custom/callback`
     return {
       redirect_uri: `${window.location.origin}/oauth/custom/callback`,
       auth_url: '',
       token_url: '',
       user_info_url: '',
-      scopes: [],
+      scopes: ['openid'],
     }
   }
   return {}
