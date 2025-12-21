@@ -374,6 +374,9 @@ func (settingService *SettingService) GetOAuth2Setting(
 			setting.Scopes = []string{
 				"read:user",
 			}
+			setting.IsOIDC = false
+			setting.Issuer = ""
+			setting.JWKSURL = ""
 
 			// 序列化为 JSON
 			settingToJSON, err := jsonUtil.JSONMarshal(setting)
@@ -416,6 +419,9 @@ func (settingService *SettingService) UpdateOAuth2Setting(userid uint, newSettin
 			UserInfoURL:  httpUtil.TrimURL(newSetting.UserInfoURL),
 			RedirectURI:  httpUtil.TrimURL(newSetting.RedirectURI),
 			Scopes:       newSetting.Scopes,
+			IsOIDC:       newSetting.IsOIDC,
+			Issuer:       newSetting.Issuer,
+			JWKSURL:      httpUtil.TrimURL(newSetting.JWKSURL),
 		}
 
 		// 序列化为 JSON
