@@ -45,7 +45,10 @@ type UserServiceInterface interface {
 	GetOAuthInfo(userId uint, provider string) (model.OAuthInfoDto, error)
 
 	// Passkey / WebAuthn
-	PasskeyRegisterBegin(userID uint, rpID, origin, deviceName string) (authModel.PasskeyRegisterBeginResp, error)
+	PasskeyRegisterBegin(
+		userID uint,
+		rpID, origin, deviceName string,
+	) (authModel.PasskeyRegisterBeginResp, error)
 	PasskeyRegisterFinish(userID uint, rpID, origin, nonce string, credential json.RawMessage) error
 	PasskeyLoginBegin(rpID, origin string) (authModel.PasskeyLoginBeginResp, error)
 	PasskeyLoginFinish(rpID, origin, nonce string, credential json.RawMessage) (string, error)

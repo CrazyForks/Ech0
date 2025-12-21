@@ -49,7 +49,12 @@ type UserRepositoryInterface interface {
 	CreatePasskey(ctx context.Context, passkey *authModel.Passkey) error
 	ListPasskeysByUserID(userID uint) ([]authModel.Passkey, error)
 	GetPasskeyByCredentialID(credentialID string) (authModel.Passkey, error)
-	UpdatePasskeyUsage(ctx context.Context, passkeyID uint, signCount uint32, lastUsedAt time.Time) error
+	UpdatePasskeyUsage(
+		ctx context.Context,
+		passkeyID uint,
+		signCount uint32,
+		lastUsedAt time.Time,
+	) error
 	UpdatePasskeyDeviceName(ctx context.Context, userID, passkeyID uint, deviceName string) error
 	DeletePasskeyByID(ctx context.Context, userID, passkeyID uint) error
 

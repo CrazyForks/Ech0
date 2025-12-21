@@ -5,13 +5,12 @@ import (
 	"errors"
 	"strings"
 
-	"gorm.io/gorm"
-
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	inboxModel "github.com/lin-snow/ech0/internal/model/inbox"
 	inboxRepository "github.com/lin-snow/ech0/internal/repository/inbox"
 	commonService "github.com/lin-snow/ech0/internal/service/common"
 	"github.com/lin-snow/ech0/internal/transaction"
+	"gorm.io/gorm"
 )
 
 type InboxService struct {

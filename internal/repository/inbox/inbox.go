@@ -3,10 +3,9 @@ package repository
 import (
 	"context"
 
-	"gorm.io/gorm"
-
 	inboxModel "github.com/lin-snow/ech0/internal/model/inbox"
 	"github.com/lin-snow/ech0/internal/transaction"
+	"gorm.io/gorm"
 )
 
 type InboxRepository struct {
@@ -28,7 +27,10 @@ func (inboxRepository *InboxRepository) getDB(ctx context.Context) *gorm.DB {
 }
 
 // PostInbox 创建收件箱消息
-func (inboxRepository *InboxRepository) PostInbox(ctx context.Context, inbox *inboxModel.Inbox) error {
+func (inboxRepository *InboxRepository) PostInbox(
+	ctx context.Context,
+	inbox *inboxModel.Inbox,
+) error {
 	return inboxRepository.getDB(ctx).Create(inbox).Error
 }
 
@@ -114,7 +116,9 @@ func (inboxRepository *InboxRepository) ClearInbox(ctx context.Context) error {
 }
 
 // GetUnreadInbox 获取所有未读消息
-func (inboxRepository *InboxRepository) GetUnreadInbox(ctx context.Context) ([]*inboxModel.Inbox, error) {
+func (inboxRepository *InboxRepository) GetUnreadInbox(
+	ctx context.Context,
+) ([]*inboxModel.Inbox, error) {
 	var inboxes []*inboxModel.Inbox
 	if err := inboxRepository.getDB(ctx).
 		Where("read = ?", false).

@@ -170,7 +170,8 @@ func (userService *UserService) Register(registerDto *authModel.RegisterDto) err
 			},
 		),
 	); err != nil {
-		logUtil.GetLogger().Error("Failed to publish user created event", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to publish user created event", zap.String("error", err.Error()))
 	}
 
 	return nil
@@ -238,7 +239,8 @@ func (userService *UserService) UpdateUser(userid uint, userdto model.UserInfoDt
 			},
 		),
 	); err != nil {
-		logUtil.GetLogger().Error("Failed to publish user updated event", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to publish user updated event", zap.String("error", err.Error()))
 	}
 
 	return nil
@@ -300,7 +302,8 @@ func (userService *UserService) UpdateUserAdmin(userid uint, id uint) error {
 			},
 		),
 	); err != nil {
-		logUtil.GetLogger().Error("Failed to publish user updated event", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to publish user updated event", zap.String("error", err.Error()))
 	}
 
 	return nil
@@ -409,7 +412,11 @@ func (userService *UserService) GetUserByID(userId int) (model.User, error) {
 }
 
 // BindOAuth 绑定 OAuth2 账号(支持 OAuth2 和 OIDC)
-func (userService *UserService) BindOAuth(userID uint, provider string, redirectURI string) (string, error) {
+func (userService *UserService) BindOAuth(
+	userID uint,
+	provider string,
+	redirectURI string,
+) (string, error) {
 	user, err := userService.userRepository.GetUserByID(int(userID))
 	if err != nil {
 		return "", err
@@ -443,7 +450,10 @@ func (userService *UserService) BindOAuth(userID uint, provider string, redirect
 }
 
 // GetOAuthLoginURL 获取 OAuth2 登录 URL
-func (userService *UserService) GetOAuthLoginURL(provider string, redirectURI string) (string, error) {
+func (userService *UserService) GetOAuthLoginURL(
+	provider string,
+	redirectURI string,
+) (string, error) {
 	setting, err := userService.getOAuthSetting(provider)
 	if err != nil {
 		return "", err
@@ -468,7 +478,11 @@ func (userService *UserService) GetOAuthLoginURL(provider string, redirectURI st
 }
 
 // HandleOAuthCallback 处理 OAuth2 回调
-func (userService *UserService) HandleOAuthCallback(provider string, code string, state string) string {
+func (userService *UserService) HandleOAuthCallback(
+	provider string,
+	code string,
+	state string,
+) string {
 	setting, err := userService.getOAuthSetting(provider)
 	if err != nil {
 		return ""
@@ -497,7 +511,13 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, fmt.Sprint(githubUser.ID), "", string(authModel.AuthTypeOAuth2))
+		return userService.resolveOAuthCallback(
+			oauthState,
+			provider,
+			fmt.Sprint(githubUser.ID),
+			"",
+			string(authModel.AuthTypeOAuth2),
+		)
 
 	case string(commonModel.OAuth2GOOGLE):
 		tokenResp, err := exchangeGoogleCodeForToken(setting, code)
@@ -512,7 +532,13 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, googleUser.Sub, "", string(authModel.AuthTypeOAuth2))
+		return userService.resolveOAuthCallback(
+			oauthState,
+			provider,
+			googleUser.Sub,
+			"",
+			string(authModel.AuthTypeOAuth2),
+		)
 
 	case string(commonModel.OAuth2QQ):
 		tokenResp, err := exchangeQQCodeForToken(setting, code)
@@ -527,7 +553,13 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		return userService.resolveOAuthCallback(oauthState, provider, qqOpenIDResp.OpenID, "", string(authModel.AuthTypeOAuth2))
+		return userService.resolveOAuthCallback(
+			oauthState,
+			provider,
+			qqOpenIDResp.OpenID,
+			"",
+			string(authModel.AuthTypeOAuth2),
+		)
 
 	case string(commonModel.OAuth2CUSTOM):
 		// 使用 code 换取 access_token
@@ -567,7 +599,9 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 	}
 }
 
-func (userService *UserService) getOAuthSetting(provider string) (*settingModel.OAuth2Setting, error) {
+func (userService *UserService) getOAuthSetting(
+	provider string,
+) (*settingModel.OAuth2Setting, error) {
 	var setting settingModel.OAuth2Setting
 	if err := userService.settingService.GetOAuth2Setting(0, &setting, true); err != nil {
 		return nil, err
@@ -582,7 +616,8 @@ func (userService *UserService) getOAuthSetting(provider string) (*settingModel.
 	}
 
 	if setting.ClientID == "" || setting.RedirectURI == "" || setting.AuthURL == "" || setting.TokenURL == "" ||
-		setting.UserInfoURL == "" || setting.ClientSecret == "" {
+		setting.UserInfoURL == "" ||
+		setting.ClientSecret == "" {
 		return nil, errors.New(commonModel.OAUTH2_NOT_CONFIGURED)
 	}
 
@@ -728,7 +763,14 @@ func (userService *UserService) resolveOAuthCallback(
 		}
 
 		_ = userService.txManager.Run(func(ctx context.Context) error {
-			return userService.userRepository.BindOAuth(ctx, oauthState.UserID, provider, externalID, issuer, authType)
+			return userService.userRepository.BindOAuth(
+				ctx,
+				oauthState.UserID,
+				provider,
+				externalID,
+				issuer,
+				authType,
+			)
 		})
 
 		return oauthState.Redirect + "?bind=success"
@@ -774,7 +816,10 @@ func exchangeGithubCodeForToken(
 }
 
 // 获取 GitHub 用户信息
-func fetchGitHubUserInfo(setting *settingModel.OAuth2Setting, accessToken string) (*authModel.GitHubUser, error) {
+func fetchGitHubUserInfo(
+	setting *settingModel.OAuth2Setting,
+	accessToken string,
+) (*authModel.GitHubUser, error) {
 	req, _ := http.NewRequest("GET", setting.UserInfoURL, nil)
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Accept", "application/json")
@@ -831,7 +876,10 @@ func exchangeGoogleCodeForToken(
 }
 
 // 获取 Google 用户信息
-func fetchGoogleUserInfo(setting *settingModel.OAuth2Setting, accessToken string) (*authModel.GoogleUser, error) {
+func fetchGoogleUserInfo(
+	setting *settingModel.OAuth2Setting,
+	accessToken string,
+) (*authModel.GoogleUser, error) {
 	req, _ := http.NewRequest("GET", setting.UserInfoURL, nil)
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Accept", "application/json")
@@ -856,7 +904,10 @@ func fetchGoogleUserInfo(setting *settingModel.OAuth2Setting, accessToken string
 }
 
 // exchangeQQCodeForToken 用 code 换取 QQ access_token
-func exchangeQQCodeForToken(setting *settingModel.OAuth2Setting, code string) (*authModel.QQTokenResponse, error) {
+func exchangeQQCodeForToken(
+	setting *settingModel.OAuth2Setting,
+	code string,
+) (*authModel.QQTokenResponse, error) {
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("client_id", setting.ClientID)
@@ -915,7 +966,9 @@ func exchangeQQCodeForToken(setting *settingModel.OAuth2Setting, code string) (*
 // fetchQQUserInfo 获取 QQ 用户信息
 func fetchQQUserInfo(accessToken string) (*authModel.QQOpenIDResponse, error) {
 	// 先获取 openid
-	openIDURL := "https://graph.qq.com/oauth2.0/me" + "?access_token=" + url.QueryEscape(accessToken) + "&fmt=json"
+	openIDURL := "https://graph.qq.com/oauth2.0/me" + "?access_token=" + url.QueryEscape(
+		accessToken,
+	) + "&fmt=json"
 	req, _ := http.NewRequest("GET", openIDURL, nil)
 	req.Header.Set("Accept", "application/json")
 
@@ -939,7 +992,10 @@ func fetchQQUserInfo(accessToken string) (*authModel.QQOpenIDResponse, error) {
 }
 
 // exchangeCustomCodeForToken 通用 OAuth2 令牌交换
-func exchangeCustomCodeForToken(setting *settingModel.OAuth2Setting, code string) (accessToken string, idToken string, err error) {
+func exchangeCustomCodeForToken(
+	setting *settingModel.OAuth2Setting,
+	code string,
+) (accessToken string, idToken string, err error) {
 	data := url.Values{}
 	data.Set("client_id", setting.ClientID)
 	data.Set("client_secret", setting.ClientSecret)
@@ -989,7 +1045,10 @@ func exchangeCustomCodeForToken(setting *settingModel.OAuth2Setting, code string
 }
 
 // fetchCustomUserInfo 获取自定义 OAuth2 用户信息
-func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken, idToken string) (string, error) {
+func fetchCustomUserInfo(
+	setting *settingModel.OAuth2Setting,
+	accessToken, idToken string,
+) (string, error) {
 	// OIDC: 直接使用 id_token 中的 sub 字段
 	if setting.IsOIDC {
 		if idToken == "" {
@@ -997,7 +1056,12 @@ func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken, idTok
 		}
 
 		// 校验并解析 id_token
-		claims, err := jwtUtil.ParseAndVerifyIDToken(idToken, setting.Issuer, setting.JWKSURL, setting.ClientID)
+		claims, err := jwtUtil.ParseAndVerifyIDToken(
+			idToken,
+			setting.Issuer,
+			setting.JWKSURL,
+			setting.ClientID,
+		)
 		if err != nil {
 			return "", err
 		}
@@ -1038,7 +1102,10 @@ func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken, idTok
 }
 
 // GetOAuthInfo 获取 OAuth2 信息
-func (userService *UserService) GetOAuthInfo(userId uint, provider string) (model.OAuthInfoDto, error) {
+func (userService *UserService) GetOAuthInfo(
+	userId uint,
+	provider string,
+) (model.OAuthInfoDto, error) {
 	var oauthInfo model.OAuthInfoDto
 
 	// 检查当前用户是否存在
@@ -1067,7 +1134,11 @@ func (userService *UserService) GetOAuthInfo(userId uint, provider string) (mode
 	// 获取绑定信息
 	var oauthInfoBinding model.OAuthBinding
 	if isOIDC {
-		oauthInfoBinding, err = userService.userRepository.GetOAuthOIDCInfo(user.ID, provider, issuer)
+		oauthInfoBinding, err = userService.userRepository.GetOAuthOIDCInfo(
+			user.ID,
+			provider,
+			issuer,
+		)
 		if err != nil {
 			return oauthInfo, err
 		}
@@ -1152,7 +1223,9 @@ func (userService *UserService) newWebAuthn(rpID, origin string) (*webauthn.WebA
 	})
 }
 
-func (userService *UserService) getWebauthnUserByID(userID uint) (*webauthnUser, model.User, error) {
+func (userService *UserService) getWebauthnUserByID(
+	userID uint,
+) (*webauthnUser, model.User, error) {
 	u, err := userService.userRepository.GetUserByID(int(userID))
 	if err != nil {
 		return nil, model.User{}, err
@@ -1181,7 +1254,10 @@ func (userService *UserService) getWebauthnUserByID(userID uint) (*webauthnUser,
 	}, u, nil
 }
 
-func (userService *UserService) PasskeyRegisterBegin(userID uint, rpID, origin, deviceName string) (authModel.PasskeyRegisterBeginResp, error) {
+func (userService *UserService) PasskeyRegisterBegin(
+	userID uint,
+	rpID, origin, deviceName string,
+) (authModel.PasskeyRegisterBeginResp, error) {
 	var resp authModel.PasskeyRegisterBeginResp
 
 	wa, err := userService.newWebAuthn(rpID, origin)
@@ -1202,7 +1278,11 @@ func (userService *UserService) PasskeyRegisterBegin(userID uint, rpID, origin, 
 		wUser,
 		webauthn.WithResidentKeyRequirement(protocol.ResidentKeyRequirementRequired),
 		webauthn.WithAuthenticatorSelection(
-			webauthn.SelectAuthenticator("", func() *bool { b := true; return &b }(), string(protocol.VerificationPreferred)),
+			webauthn.SelectAuthenticator(
+				"",
+				func() *bool { b := true; return &b }(),
+				string(protocol.VerificationPreferred),
+			),
 		),
 	)
 	if err != nil {
@@ -1229,7 +1309,11 @@ func (userService *UserService) PasskeyRegisterBegin(userID uint, rpID, origin, 
 	return resp, nil
 }
 
-func (userService *UserService) PasskeyRegisterFinish(userID uint, rpID, origin, nonce string, credential json.RawMessage) error {
+func (userService *UserService) PasskeyRegisterFinish(
+	userID uint,
+	rpID, origin, nonce string,
+	credential json.RawMessage,
+) error {
 	cacheKey := repository.GetPasskeyRegisterSessionKey(nonce)
 	cached, err := userService.userRepository.CacheGetPasskeySession(cacheKey)
 	if err != nil {
@@ -1256,7 +1340,11 @@ func (userService *UserService) PasskeyRegisterFinish(userID uint, rpID, origin,
 		return err
 	}
 
-	req, _ := http.NewRequest("POST", "http://localhost/passkey/register/finish", bytes.NewReader(credential))
+	req, _ := http.NewRequest(
+		"POST",
+		"http://localhost/passkey/register/finish",
+		bytes.NewReader(credential),
+	)
 	req.Header.Set("Content-Type", "application/json")
 
 	cred, err := wa.FinishRegistration(wUser, sess.Session, req)
@@ -1285,7 +1373,9 @@ func (userService *UserService) PasskeyRegisterFinish(userID uint, rpID, origin,
 	})
 }
 
-func (userService *UserService) PasskeyLoginBegin(rpID, origin string) (authModel.PasskeyLoginBeginResp, error) {
+func (userService *UserService) PasskeyLoginBegin(
+	rpID, origin string,
+) (authModel.PasskeyLoginBeginResp, error) {
 	var resp authModel.PasskeyLoginBeginResp
 
 	wa, err := userService.newWebAuthn(rpID, origin)
@@ -1319,7 +1409,10 @@ func (userService *UserService) PasskeyLoginBegin(rpID, origin string) (authMode
 	return resp, nil
 }
 
-func (userService *UserService) PasskeyLoginFinish(rpID, origin, nonce string, credential json.RawMessage) (string, error) {
+func (userService *UserService) PasskeyLoginFinish(
+	rpID, origin, nonce string,
+	credential json.RawMessage,
+) (string, error) {
 	cacheKey := repository.GetPasskeyLoginSessionKey(nonce)
 	cached, err := userService.userRepository.CacheGetPasskeySession(cacheKey)
 	if err != nil {
@@ -1341,7 +1434,11 @@ func (userService *UserService) PasskeyLoginFinish(rpID, origin, nonce string, c
 		return "", err
 	}
 
-	req, _ := http.NewRequest("POST", "http://localhost/passkey/login/finish", bytes.NewReader(credential))
+	req, _ := http.NewRequest(
+		"POST",
+		"http://localhost/passkey/login/finish",
+		bytes.NewReader(credential),
+	)
 	req.Header.Set("Content-Type", "application/json")
 
 	handler := func(rawID, userHandle []byte) (webauthn.User, error) {
@@ -1384,7 +1481,12 @@ func (userService *UserService) PasskeyLoginFinish(rpID, origin, nonce string, c
 	pk, err := userService.userRepository.GetPasskeyByCredentialID(credID)
 	if err == nil {
 		_ = userService.txManager.Run(func(ctx context.Context) error {
-			return userService.userRepository.UpdatePasskeyUsage(ctx, pk.ID, credentialObj.Authenticator.SignCount, time.Now())
+			return userService.userRepository.UpdatePasskeyUsage(
+				ctx,
+				pk.ID,
+				credentialObj.Authenticator.SignCount,
+				time.Now(),
+			)
 		})
 	}
 
@@ -1426,11 +1528,19 @@ func (userService *UserService) DeletePasskey(userID, passkeyID uint) error {
 	})
 }
 
-func (userService *UserService) UpdatePasskeyDeviceName(userID, passkeyID uint, deviceName string) error {
+func (userService *UserService) UpdatePasskeyDeviceName(
+	userID, passkeyID uint,
+	deviceName string,
+) error {
 	if strings.TrimSpace(deviceName) == "" {
 		return errors.New(commonModel.INVALID_PARAMS_BODY)
 	}
 	return userService.txManager.Run(func(ctx context.Context) error {
-		return userService.userRepository.UpdatePasskeyDeviceName(ctx, userID, passkeyID, deviceName)
+		return userService.userRepository.UpdatePasskeyDeviceName(
+			ctx,
+			userID,
+			passkeyID,
+			deviceName,
+		)
 	})
 }

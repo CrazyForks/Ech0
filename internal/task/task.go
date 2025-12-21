@@ -7,9 +7,6 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-
 	"github.com/lin-snow/ech0/internal/backup"
 	"github.com/lin-snow/ech0/internal/event"
 	settingModel "github.com/lin-snow/ech0/internal/model/setting"
@@ -17,6 +14,8 @@ import (
 	commonService "github.com/lin-snow/ech0/internal/service/common"
 	settingService "github.com/lin-snow/ech0/internal/service/setting"
 	logUtil "github.com/lin-snow/ech0/internal/util/log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Tasker struct {
@@ -57,7 +56,8 @@ func (t *Tasker) Start() {
 	// 读取自动备份cron设置
 	var backupScheduleSetting settingModel.BackupSchedule
 	if err := t.settingService.GetBackupScheduleSetting(&backupScheduleSetting); err != nil {
-		logUtil.GetLogger().Error("Failed to get backup schedule setting", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to get backup schedule setting", zap.String("error", err.Error()))
 		// 默认启用定时备份任务
 		backupScheduleSetting.Enable = false
 		backupScheduleSetting.CronExpression = "0 2 * * 0" // 每周日2点执行一次
@@ -83,13 +83,15 @@ func (t *Tasker) CleanupTempFilesTask() {
 		gocron.NewTask(
 			func() {
 				if err := t.commonService.CleanupTempFiles(); err != nil {
-					logUtil.GetLogger().Error("Failed to clean up temporary files", zap.String("error", err.Error()))
+					logUtil.GetLogger().
+						Error("Failed to clean up temporary files", zap.String("error", err.Error()))
 				}
 			},
 		),
 	)
 	if err != nil {
-		logUtil.GetLogger().Error("Failed to schedule CleanupTempFilesTask", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to schedule CleanupTempFilesTask", zap.String("error", err.Error()))
 	}
 }
 
@@ -104,7 +106,8 @@ func (t *Tasker) DeadLetterConsumeTask() {
 				// 取出死信队列中的任务，逐个重试
 				deadLetters, err := t.queueRepo.ListDeadLetters(10)
 				if err != nil {
-					logUtil.GetLogger().Error("Failed To Get DeadLetters!", zap.String("error", err.Error()))
+					logUtil.GetLogger().
+						Error("Failed To Get DeadLetters!", zap.String("error", err.Error()))
 				}
 
 				// 遍历死信任务，重新发送事件
@@ -118,14 +121,16 @@ func (t *Tasker) DeadLetterConsumeTask() {
 							},
 						),
 					); err != nil {
-						logUtil.GetLogger().Error("Failed to publish dead letter retried event", zap.String("error", err.Error()))
+						logUtil.GetLogger().
+							Error("Failed to publish dead letter retried event", zap.String("error", err.Error()))
 					}
 				}
 			},
 		),
 	)
 	if err != nil {
-		logUtil.GetLogger().Error("Failed to schedule WebhookRetryTask", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to schedule WebhookRetryTask", zap.String("error", err.Error()))
 	}
 }
 
@@ -163,13 +168,15 @@ func (t *Tasker) ScheduleBackupTask(cronExpression string) {
 						},
 					),
 				); err != nil {
-					logUtil.GetLogger().Error("Failed to publish backup completed event", zap.String("error", err.Error()))
+					logUtil.GetLogger().
+						Error("Failed to publish backup completed event", zap.String("error", err.Error()))
 				}
 			},
 		),
 		gocron.WithTags("BackupSchedule"),
 	)
 	if err != nil {
-		logUtil.GetLogger().Error("Failed to schedule ScheduleBackupTask", zap.String("error", err.Error()))
+		logUtil.GetLogger().
+			Error("Failed to schedule ScheduleBackupTask", zap.String("error", err.Error()))
 	}
 }

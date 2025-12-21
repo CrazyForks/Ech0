@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-
 	"github.com/lin-snow/ech0/internal/config"
 	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	userModel "github.com/lin-snow/ech0/internal/model/user"
@@ -29,10 +28,12 @@ func CreateClaims(user userModel.User) jwt.Claims {
 		Userid:   user.ID,
 		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    config.Config.Auth.Jwt.Issuer,
-			Subject:   user.Username,
-			Audience:  jwt.ClaimStrings{config.Config.Auth.Jwt.Audience},
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(config.Config.Auth.Jwt.Expires) * time.Second)),
+			Issuer:   config.Config.Auth.Jwt.Issuer,
+			Subject:  user.Username,
+			Audience: jwt.ClaimStrings{config.Config.Auth.Jwt.Audience},
+			ExpiresAt: jwt.NewNumericDate(
+				time.Now().Add(time.Duration(config.Config.Auth.Jwt.Expires) * time.Second),
+			),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now().Add(-leeway)),
 		},
@@ -73,9 +74,13 @@ func GenerateToken(claim jwt.Claims) (string, error) {
 // ParseToken 解析JWT Token
 func ParseToken(tokenString string) (*authModel.MyClaims, error) {
 	claims := &authModel.MyClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return config.JWT_SECRET, nil
-	})
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		claims,
+		func(token *jwt.Token) (interface{}, error) {
+			return config.JWT_SECRET, nil
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +94,11 @@ func ParseToken(tokenString string) (*authModel.MyClaims, error) {
 }
 
 // GenerateOAuthState 生成 OAuth2 state token
-func GenerateOAuthState(action string, userID uint, redirect, provider string) (string, string, error) {
+func GenerateOAuthState(
+	action string,
+	userID uint,
+	redirect, provider string,
+) (string, string, error) {
 	now := time.Now()
 	expiration := now.Add(10 * time.Minute)
 
@@ -153,23 +162,27 @@ func ParseAndVerifyIDToken(idToken, issuer, jwksURL, clientID string) (jwt.MapCl
 	parser := jwt.NewParser(jwt.WithLeeway(time.Minute))
 	validator := jwt.NewValidator(jwt.WithLeeway(time.Minute))
 
-	token, err := parser.ParseWithClaims(idToken, claims, func(token *jwt.Token) (interface{}, error) {
-		kid, _ := token.Header["kid"].(string)
-		if kid != "" {
-			if key, ok := keySet[kid]; ok {
-				return key, nil
+	token, err := parser.ParseWithClaims(
+		idToken,
+		claims,
+		func(token *jwt.Token) (interface{}, error) {
+			kid, _ := token.Header["kid"].(string)
+			if kid != "" {
+				if key, ok := keySet[kid]; ok {
+					return key, nil
+				}
+				return nil, errors.New("未找到匹配 kid 的 JWKS 公钥")
 			}
-			return nil, errors.New("未找到匹配 kid 的 JWKS 公钥")
-		}
 
-		if len(keySet) == 1 {
-			for _, key := range keySet {
-				return key, nil
+			if len(keySet) == 1 {
+				for _, key := range keySet {
+					return key, nil
+				}
 			}
-		}
 
-		return nil, errors.New("id_token 缺少 kid 且 JWKS 含多把公钥")
-	})
+			return nil, errors.New("id_token 缺少 kid 且 JWKS 含多把公钥")
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

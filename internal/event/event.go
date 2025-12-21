@@ -6,10 +6,9 @@ import (
 	"sync"
 	"time"
 
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
 	"github.com/oklog/ulid/v2"
 	"go.uber.org/zap"
-
-	logUtil "github.com/lin-snow/ech0/internal/util/log"
 )
 
 // 定义事件类型
@@ -147,7 +146,9 @@ func (eb *EventBus) Publish(ctx context.Context, event *Event) error {
 			go func(h EventHandler) {
 				if err := h(ctx, event); err != nil {
 					// 错误处理
-					logUtil.GetLogger().Error("Event Handler Error:", zap.String("err", err.Error()))
+					logUtil.GetLogger().
+						Error("Event Handler Error:", zap.String("err", err.Error()))
+
 					// log.Println("Event Handler Error:", err)
 				}
 			}(gh.handler)

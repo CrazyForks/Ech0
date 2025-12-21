@@ -22,8 +22,10 @@ const (
 	NO_USER_LOGINED = uint(0)
 )
 
-type OAuth2Action string
-type AuthType string
+type (
+	OAuth2Action string
+	AuthType     string
+)
 
 const (
 	// OAuth2ActionLogin 表示登录操作
@@ -138,7 +140,7 @@ type PasskeyRegisterBeginResp struct {
 
 // PasskeyFinishReq Passkey finish 请求（注册/登录共用）
 type PasskeyFinishReq struct {
-	Nonce      string          `json:"nonce" binding:"required"`
+	Nonce      string          `json:"nonce"      binding:"required"`
 	Credential json.RawMessage `json:"credential" binding:"required"`
 }
 

@@ -4,12 +4,11 @@ import (
 	"context"
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/lin-snow/ech0/internal/cache"
 	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	model "github.com/lin-snow/ech0/internal/model/user"
 	"github.com/lin-snow/ech0/internal/transaction"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
@@ -17,7 +16,10 @@ type UserRepository struct {
 	cache cache.ICache[string, any]
 }
 
-func NewUserRepository(dbProvider func() *gorm.DB, cache cache.ICache[string, any]) UserRepositoryInterface {
+func NewUserRepository(
+	dbProvider func() *gorm.DB,
+	cache cache.ICache[string, any],
+) UserRepositoryInterface {
 	return &UserRepository{
 		db:    dbProvider,
 		cache: cache,
@@ -162,12 +164,19 @@ func (userRepository *UserRepository) DeleteUser(ctx context.Context, id uint) e
 }
 
 // BindOAuth 绑定 OAuth 或 OIDC 账号
-func (userRepository *UserRepository) BindOAuth(ctx context.Context, userID uint, provider, oauthID, issuer, authType string) error {
+func (userRepository *UserRepository) BindOAuth(
+	ctx context.Context,
+	userID uint,
+	provider, oauthID, issuer, authType string,
+) error {
 	// 检查是否已绑定(可能是 OAuth2 或 OIDC)
 	var existing model.OAuthBinding
 	if authType == string(authModel.AuthTypeOIDC) {
 		// 查出 OIDC 绑定 (auth_type 为 oidc)
-		err := userRepository.getDB(ctx).Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userID, provider, issuer, string(authModel.AuthTypeOIDC)).First(&existing).Error
+		err := userRepository.getDB(ctx).
+			Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userID, provider, issuer, string(authModel.AuthTypeOIDC)).
+			First(&existing).
+			Error
 		if err == nil {
 			// 已绑定，更新 oauth_id
 			existing.OAuthID = oauthID
@@ -211,7 +220,10 @@ func (userRepository *UserRepository) GetUserByOAuthID(
 	provider, oauthID string,
 ) (model.User, error) {
 	var binding model.OAuthBinding
-	err := userRepository.getDB(ctx).Where("provider = ? AND o_auth_id = ?", provider, oauthID).First(&binding).Error
+	err := userRepository.getDB(ctx).
+		Where("provider = ? AND o_auth_id = ?", provider, oauthID).
+		First(&binding).
+		Error
 	if err != nil {
 		return model.User{}, err
 	}
@@ -242,7 +254,10 @@ func (userRepository *UserRepository) GetUserByOIDC(
 }
 
 // GetOAuthInfo 获取 OAuth2 信息
-func (userRepository *UserRepository) GetOAuthInfo(userId uint, provider string) (model.OAuthBinding, error) {
+func (userRepository *UserRepository) GetOAuthInfo(
+	userId uint,
+	provider string,
+) (model.OAuthBinding, error) {
 	var oauthInfo model.OAuthBinding
 	err := userRepository.db().
 		Where("user_id = ? AND provider = ? AND (auth_type = ? OR auth_type IS NULL)", userId, provider, string(authModel.AuthTypeOAuth2)).
@@ -255,9 +270,16 @@ func (userRepository *UserRepository) GetOAuthInfo(userId uint, provider string)
 }
 
 // GetOAuthOIDCInfo 获取 OIDC 信息
-func (userRepository *UserRepository) GetOAuthOIDCInfo(userId uint, provider string, issuer string) (model.OAuthBinding, error) {
+func (userRepository *UserRepository) GetOAuthOIDCInfo(
+	userId uint,
+	provider string,
+	issuer string,
+) (model.OAuthBinding, error) {
 	var oauthInfo model.OAuthBinding
-	err := userRepository.db().Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userId, provider, issuer, string(authModel.AuthTypeOIDC)).First(&oauthInfo).Error
+	err := userRepository.db().
+		Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userId, provider, issuer, string(authModel.AuthTypeOIDC)).
+		First(&oauthInfo).
+		Error
 	if err != nil {
 		return model.OAuthBinding{}, err
 	}
@@ -268,11 +290,16 @@ func (userRepository *UserRepository) GetOAuthOIDCInfo(userId uint, provider str
 // Passkey / WebAuthn
 // -----------------------
 
-func (userRepository *UserRepository) CreatePasskey(ctx context.Context, passkey *authModel.Passkey) error {
+func (userRepository *UserRepository) CreatePasskey(
+	ctx context.Context,
+	passkey *authModel.Passkey,
+) error {
 	return userRepository.getDB(ctx).Create(passkey).Error
 }
 
-func (userRepository *UserRepository) ListPasskeysByUserID(userID uint) ([]authModel.Passkey, error) {
+func (userRepository *UserRepository) ListPasskeysByUserID(
+	userID uint,
+) ([]authModel.Passkey, error) {
 	var passkeys []authModel.Passkey
 	if err := userRepository.db().
 		Where("user_id = ?", userID).
@@ -283,7 +310,9 @@ func (userRepository *UserRepository) ListPasskeysByUserID(userID uint) ([]authM
 	return passkeys, nil
 }
 
-func (userRepository *UserRepository) GetPasskeyByCredentialID(credentialID string) (authModel.Passkey, error) {
+func (userRepository *UserRepository) GetPasskeyByCredentialID(
+	credentialID string,
+) (authModel.Passkey, error) {
 	var passkey authModel.Passkey
 	if err := userRepository.db().
 		Where("credential_id = ?", credentialID).
@@ -293,7 +322,12 @@ func (userRepository *UserRepository) GetPasskeyByCredentialID(credentialID stri
 	return passkey, nil
 }
 
-func (userRepository *UserRepository) UpdatePasskeyUsage(ctx context.Context, passkeyID uint, signCount uint32, lastUsedAt time.Time) error {
+func (userRepository *UserRepository) UpdatePasskeyUsage(
+	ctx context.Context,
+	passkeyID uint,
+	signCount uint32,
+	lastUsedAt time.Time,
+) error {
 	return userRepository.getDB(ctx).
 		Model(&authModel.Passkey{}).
 		Where("id = ?", passkeyID).
@@ -303,20 +337,31 @@ func (userRepository *UserRepository) UpdatePasskeyUsage(ctx context.Context, pa
 		}).Error
 }
 
-func (userRepository *UserRepository) UpdatePasskeyDeviceName(ctx context.Context, userID, passkeyID uint, deviceName string) error {
+func (userRepository *UserRepository) UpdatePasskeyDeviceName(
+	ctx context.Context,
+	userID, passkeyID uint,
+	deviceName string,
+) error {
 	return userRepository.getDB(ctx).
 		Model(&authModel.Passkey{}).
 		Where("id = ? AND user_id = ?", passkeyID, userID).
 		Update("device_name", deviceName).Error
 }
 
-func (userRepository *UserRepository) DeletePasskeyByID(ctx context.Context, userID, passkeyID uint) error {
+func (userRepository *UserRepository) DeletePasskeyByID(
+	ctx context.Context,
+	userID, passkeyID uint,
+) error {
 	return userRepository.getDB(ctx).
 		Where("id = ? AND user_id = ?", passkeyID, userID).
 		Delete(&authModel.Passkey{}).Error
 }
 
-func (userRepository *UserRepository) CacheSetPasskeySession(key string, val any, ttl time.Duration) {
+func (userRepository *UserRepository) CacheSetPasskeySession(
+	key string,
+	val any,
+	ttl time.Duration,
+) {
 	_ = userRepository.cache.SetWithTTL(key, val, 1, ttl)
 }
 
