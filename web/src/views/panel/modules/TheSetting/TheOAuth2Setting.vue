@@ -395,7 +395,7 @@ const handleBindOAuth2 = async () => {
   if (res.code !== 1) {
     theToast.error(res.msg)
   } else {
-    console.log("Bind URL: ",res.data)
+    console.log('Bind URL: ', res.data)
     // 成功，跳转到授权URL
     window.location.href = res.data
   }
