@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -101,4 +103,16 @@ type QQUser struct {
 	FigureURLQQ1 string `json:"figureurl_qq_1"`
 	FigureURLQQ2 string `json:"figureurl_qq_2"`
 	Gender       string `json:"gender"`
+}
+
+// Passkey/WebAuthn 定义 Passkey/WebAuthn 实体，用于存储 Passkey/WebAuthn 凭证信息和绑定已有用户
+type Passkey struct {
+	ID           uint   `gorm:"primaryKey"`
+	UserID       uint   `gorm:"not null;index"`
+	CredentialID string `gorm:"size:255;not null;uniqueIndex:uid_cred"`
+	PublicKey    string `gorm:"type:text;not null"` // 或 []byte
+	SignCount    uint32 `gorm:"not null;default:0"`
+	LastUsedAt   time.Time
+	DeviceName   string `gorm:"size:128"`
+	AAGUID       string `gorm:"size:36"`
 }

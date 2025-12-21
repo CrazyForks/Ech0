@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm/logger"
 
 	"github.com/lin-snow/ech0/internal/config"
+	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	connectModel "github.com/lin-snow/ech0/internal/model/connect"
 	echoModel "github.com/lin-snow/ech0/internal/model/echo"
@@ -131,6 +132,7 @@ func MigrateDB() error {
 		&queueModel.DeadLetter{},
 		&settingModel.AccessTokenSetting{},
 		&inboxModel.Inbox{},
+		&authModel.Passkey{},
 
 		// Fediverse 相关
 		&fediverseModel.Follow{},
