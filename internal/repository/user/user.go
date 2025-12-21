@@ -218,6 +218,28 @@ func (userRepository *UserRepository) GetUserByOAuthID(
 	return userRepository.GetUserByID(int(binding.UserID))
 }
 
+// GetUserByOIDC 根据 OIDC 提供商、issuer 与 sub 获取用户
+func (userRepository *UserRepository) GetUserByOIDC(
+	ctx context.Context,
+	provider, oauthID, issuer string,
+) (model.User, error) {
+	var binding model.OAuthBinding
+	err := userRepository.getDB(ctx).
+		Where(
+			"provider = ? AND o_auth_id = ? AND issuer = ? AND auth_type = ?",
+			provider,
+			oauthID,
+			issuer,
+			string(authModel.AuthTypeOIDC),
+		).
+		First(&binding).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return userRepository.GetUserByID(int(binding.UserID))
+}
+
 // GetOAuthInfo 获取 OAuth2 信息
 func (userRepository *UserRepository) GetOAuthInfo(userId uint, provider string) (model.OAuthBinding, error) {
 	var oauthInfo model.OAuthBinding

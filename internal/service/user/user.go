@@ -676,11 +676,25 @@ func (userService *UserService) resolveOAuthCallback(
 			return ""
 		}
 
-		user, err := userService.userRepository.GetUserByOAuthID(
-			context.Background(),
-			provider,
-			externalID,
+		var (
+			user model.User
+			err  error
 		)
+
+		if authType == string(authModel.AuthTypeOIDC) {
+			user, err = userService.userRepository.GetUserByOIDC(
+				context.Background(),
+				provider,
+				externalID,
+				issuer,
+			)
+		} else {
+			user, err = userService.userRepository.GetUserByOAuthID(
+				context.Background(),
+				provider,
+				externalID,
+			)
+		}
 		if err != nil {
 			fmt.Printf("Error fetching user by %s OAuth ID: %v\n", provider, err)
 			return ""
