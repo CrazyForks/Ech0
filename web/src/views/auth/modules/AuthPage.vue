@@ -26,23 +26,22 @@
         <!-- 账号密码输入 -->
         <BaseInput v-model="username" type="text" placeholder="请输入用户名" class="mb-4" />
         <BaseInput v-model="password" type="password" placeholder="请输入密码" class="mb-4" />
-        <div class="flex justify-between items-center px-0.5">
+        <div class="flex justify-between items-center">
           <BaseButton
             @click="router.push({ name: 'home' })"
             title="返回首页"
             :icon="Home"
-            class="rounded-md w-9 h-9"
+            class="rounded-md w-9 h-9 flex-shrink-0"
           />
-          <div class="flex items-center">
+          <div class="w-full flex items-center justify-end gap-1">
             <!-- Passkey 登录（Resident Key / 无用户名） -->
             <BaseButton
+              :icon="Passkey"
               v-if="passkeySupported"
               @click="handlePasskeyLogin"
-              class="w-20 h-9 rounded-md mr-2"
+              class="rounded-md w-9 h-9"
               title="使用 Passkey 登录"
-            >
-              <span class="text-[var(--text-color-next-500)] text-xs">Passkey</span>
-            </BaseButton>
+            />
             <!-- OAuth2 登录 -->
             <BaseButton
               v-if="oauth2Status && oauth2Status.enabled"
@@ -56,13 +55,14 @@
                       : Customoauth
               "
               @click="gotoOAuth2URL"
-              class="w-9 h-9 rounded-md mr-2"
+              class="w-9 h-9 rounded-md"
+              title="使用 OAuth2 登录"
             />
-            <!-- 账号密码登录 -->
-            <BaseButton @click="handleLogin" class="w-12 h-9 rounded-md">
-              <span class="text-[var(--text-color-next-500)]">登录</span>
-            </BaseButton>
           </div>
+          <!-- 账号密码登录 -->
+          <BaseButton @click="handleLogin" class="w-12 h-9 rounded-md ml-1 flex-shrink-0">
+            <span class="text-[var(--text-color-next-500)]">登录</span>
+          </BaseButton>
         </div>
       </div>
       <!-- 注册 -->
@@ -106,6 +106,7 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useUserStore } from '@/stores'
 import Arrow from '@/components/icons/arrow.vue'
+import Passkey from '@/components/icons/passkey.vue'
 import Home from '@/components/icons/home.vue'
 import Github from '@/components/icons/github.vue'
 import Google from '@/components/icons/google.vue'
