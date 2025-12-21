@@ -456,6 +456,16 @@ function getProviderTemplate(provider: string) {
   return {}
 }
 
+// 监听 OIDC, 如果开启并填入 issuer, 则自动填入 jwks_url
+watch(
+  () => OAuth2Setting.value.issuer,
+  (val) => {
+    if (OAuth2Setting.value.is_oidc && val) {
+      OAuth2Setting.value.jwks_url = `${val}/.well-known/jwks.json`
+    }
+  },
+)
+
 onMounted(async () => {
   const setting = await getOAuth2Setting()
   if (setting?.provider) {
