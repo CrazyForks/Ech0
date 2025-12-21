@@ -216,3 +216,29 @@ export const getHubImageUrl = (image: App.Api.Ech0.Image, baseurl: string) => {
     return baseurl + '/api' + String(image.image_url)
   }
 }
+
+/**
+ * Base64URL to Uint8Array
+ * 用于解析服务端返回的 WebAuthn publicKey
+ */
+export function base64urlToUint8Array(input: string): Uint8Array<ArrayBuffer> {
+  const base64 = input.replace(/-/g, '+').replace(/_/g, '/')
+  const pad = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4))
+  const binary = atob(base64 + pad)
+  const buffer = new ArrayBuffer(binary.length)
+  const bytes = new Uint8Array(buffer)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
+
+/**
+ * Uint8Array to Base64URL
+ * 用于生成客户端返回的 WebAuthn publicKey
+ */
+export function uint8ArrayToBase64url(bytes: ArrayBuffer | Uint8Array): string {
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
+  let binary = ''
+  for (let i = 0; i < u8.length; i++) binary += String.fromCharCode(u8[i]!)
+  const base64 = btoa(binary)
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+}

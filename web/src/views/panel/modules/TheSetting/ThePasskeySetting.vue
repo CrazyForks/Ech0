@@ -118,6 +118,8 @@ import {
 } from '@/service/api'
 import { theToast } from '@/utils/toast'
 import { useBaseDialog } from '@/composables/useBaseDialog'
+import { base64urlToUint8Array, uint8ArrayToBase64url } from '@/utils/other'
+
 const { openConfirm } = useBaseDialog()
 
 const supported = !!(window.PublicKeyCredential && navigator.credentials)
@@ -148,28 +150,13 @@ type CreationOptionsJSON = Omit<
   excludeCredentials?: CredentialDescriptorJSON[]
 }
 
-function base64urlToUint8Array(input: string) {
-  const base64 = input.replace(/-/g, '+').replace(/_/g, '/')
-  const pad = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4))
-  const binary = atob(base64 + pad)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
-  return bytes
-}
-
-function uint8ArrayToBase64url(bytes: ArrayBuffer | Uint8Array) {
-  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
-  let binary = ''
-  for (let i = 0; i < u8.length; i++) binary += String.fromCharCode(u8[i]!)
-  const base64 = btoa(binary)
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
-}
-
+// 断言服务端返回的 publicKey 合法
 function assertCreationOptionsJSON(raw: unknown): CreationOptionsJSON {
   if (!raw || typeof raw !== 'object') throw new Error('服务端返回的 publicKey 不合法')
   return raw as CreationOptionsJSON
 }
 
+// 标准化服务端返回的 publicKey
 function normalizeCreationOptions(raw: unknown): PublicKeyCredentialCreationOptions {
   const o = assertCreationOptionsJSON(raw)
   const { challenge, user, excludeCredentials, ...rest } = o
@@ -191,6 +178,7 @@ function normalizeCreationOptions(raw: unknown): PublicKeyCredentialCreationOpti
   }
 }
 
+// 将 PublicKeyCredential 转换为 JSON
 function credentialToJSON(cred: PublicKeyCredential) {
   if (!cred) return null
   const obj: Record<string, unknown> = {
@@ -223,6 +211,7 @@ function credentialToJSON(cred: PublicKeyCredential) {
   return obj
 }
 
+// 格式化时间
 function formatTime(v: string) {
   if (!v) return '暂无'
   const d = new Date(v)
@@ -230,11 +219,13 @@ function formatTime(v: string) {
   return d.toLocaleString()
 }
 
+// 刷新设备列表
 async function refresh() {
   const res = await fetchPasskeyDevices()
   if (res.code === 1) devices.value = res.data ?? []
 }
 
+// 绑定设备
 async function handleBind() {
   if (!supported) return
   busy.value = true
@@ -260,6 +251,7 @@ async function handleBind() {
   }
 }
 
+// 删除设备
 async function handleDelete(id: number) {
   openConfirm({
     title: '确定要删除该设备吗？',
@@ -278,6 +270,7 @@ async function handleDelete(id: number) {
   })
 }
 
+// 改名
 async function promptRename(d: App.Api.Auth.PasskeyDevice) {
   const name = window.prompt('新的设备名称', d.device_name || 'Passkey')
   if (!name) return
