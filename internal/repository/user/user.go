@@ -245,7 +245,7 @@ func (userRepository *UserRepository) GetUserByOIDC(
 func (userRepository *UserRepository) GetOAuthInfo(userId uint, provider string) (model.OAuthBinding, error) {
 	var oauthInfo model.OAuthBinding
 	err := userRepository.db().
-		Where("user_id = ? AND provider = ? AND (auth_type = ? OR auth_type IS NULL)", userId, provider, "oauth").
+		Where("user_id = ? AND provider = ? AND (auth_type = ? OR auth_type IS NULL)", userId, provider, string(authModel.AuthTypeOAuth2)).
 		First(&oauthInfo).Error
 	if err != nil {
 		return model.OAuthBinding{}, err
@@ -257,7 +257,7 @@ func (userRepository *UserRepository) GetOAuthInfo(userId uint, provider string)
 // GetOAuthOIDCInfo 获取 OIDC 信息
 func (userRepository *UserRepository) GetOAuthOIDCInfo(userId uint, provider string, issuer string) (model.OAuthBinding, error) {
 	var oauthInfo model.OAuthBinding
-	err := userRepository.db().Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userId, provider, issuer, "oidc").First(&oauthInfo).Error
+	err := userRepository.db().Where("user_id = ? AND provider = ? AND issuer = ? AND auth_type = ?", userId, provider, issuer, string(authModel.AuthTypeOIDC)).First(&oauthInfo).Error
 	if err != nil {
 		return model.OAuthBinding{}, err
 	}

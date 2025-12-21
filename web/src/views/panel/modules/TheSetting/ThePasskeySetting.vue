@@ -11,7 +11,7 @@
 
       <!-- 绑定 -->
       <div class="flex items-center justify-start gap-2 mb-4">
-        <div class="w-48">
+        <div class="w-50">
           <BaseInput
             v-model="newDeviceName"
             type="text"
@@ -20,7 +20,7 @@
           />
         </div>
         <BaseButton
-          class="rounded-md px-3 w-20 h-9 text-sm flex items-center justify-center"
+          class="rounded-md px-3 w-14 h-9 text-sm flex items-center justify-center"
           :disabled="busy || !supported"
           @click="handleBind"
         >
@@ -78,18 +78,20 @@
               <td class="px-3 py-2 text-right">
                 <div class="flex flex-row items-center justify-end gap-2">
                   <BaseButton
-                    class="rounded-md px-2 h-8 text-xs"
+                    class="rounded-md"
                     :disabled="busy"
                     @click="promptRename(d)"
+                    title="改名"
                   >
-                    改名
+                    <Rename class="w-5 h-5" />
                   </BaseButton>
                   <BaseButton
-                    class="rounded-md px-2 h-8 text-xs"
+                    class="rounded-md"
                     :disabled="busy"
                     @click="handleDelete(d.id)"
+                    title="删除"
                   >
-                    删除
+                    <Trashbin class="w-5 h-5" />
                   </BaseButton>
                 </div>
               </td>
@@ -105,6 +107,8 @@ import { onMounted, ref } from 'vue'
 import PanelCard from '@/layout/PanelCard.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import Trashbin from '@/components/icons/trashbin.vue'
+import Rename from '@/components/icons/rename.vue'
 import {
   fetchDeletePasskeyDevice,
   fetchPasskeyDevices,

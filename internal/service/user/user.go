@@ -1059,9 +1059,9 @@ func (userService *UserService) GetOAuthInfo(userId uint, provider string) (mode
 	}
 	isOIDC := oauth2Setting.IsOIDC
 	issuer := oauth2Setting.Issuer
-	authType := "oauth"
+	authType := string(authModel.AuthTypeOAuth2)
 	if isOIDC {
-		authType = "oidc"
+		authType = string(authModel.AuthTypeOIDC)
 	}
 
 	// 获取绑定信息
@@ -1082,7 +1082,7 @@ func (userService *UserService) GetOAuthInfo(userId uint, provider string) (mode
 		Provider: oauthInfoBinding.Provider,
 		UserID:   oauthInfoBinding.UserID,
 		OAuthID:  oauthInfoBinding.OAuthID,
-		Issuer:   issuer,
+		Issuer:   oauthInfoBinding.Issuer,
 		AuthType: authType,
 	}
 

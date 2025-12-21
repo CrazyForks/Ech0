@@ -459,11 +459,12 @@ function getProviderTemplate(provider: string) {
 }
 
 onMounted(async () => {
-  const setting = await getOAuth2Setting()
-  if (setting?.provider) {
-    const res = await fetchGetOAuthInfo(setting.provider)
+  await getOAuth2Setting()
+  if (OAuth2Setting.value.provider) {
+    const res = await fetchGetOAuthInfo(OAuth2Setting.value.provider)
     if (res.code === 1) {
       oauthInfo.value = res.data
+
       if (
         oauthInfo.value.auth_type === 'oidc' &&
         oauthInfo.value.issuer &&
