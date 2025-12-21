@@ -135,7 +135,10 @@ type UserEntityJSON = {
   displayName: string
 }
 
-type CreationOptionsJSON = Omit<PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'> & {
+type CreationOptionsJSON = Omit<
+  PublicKeyCredentialCreationOptions,
+  'challenge' | 'user' | 'excludeCredentials'
+> & {
   challenge: Base64urlString
   user: UserEntityJSON
   excludeCredentials?: CredentialDescriptorJSON[]

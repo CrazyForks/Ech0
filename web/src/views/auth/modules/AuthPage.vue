@@ -170,7 +170,10 @@ function uint8ArrayToBase64url(bytes: ArrayBuffer | Uint8Array) {
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
 }
 
-type RequestOptionsJSON = Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> & {
+type RequestOptionsJSON = Omit<
+  PublicKeyCredentialRequestOptions,
+  'challenge' | 'allowCredentials'
+> & {
   challenge: string
   allowCredentials?: Array<{
     type: PublicKeyCredentialType
