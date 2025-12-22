@@ -1,9 +1,29 @@
 <template>
   <div class="mx-auto px-2 sm:px-5 my-4">
-    <div v-for="item in items" :key="item.id">
+    <div v-for="item in items" :key="item.id" class="mb-3">
       <TheInboxCard :inbox="item" />
     </div>
-    <div v-if="hasMore" @click="loadMore">加载更多</div>
+
+    <!-- 加载更多 -->
+    <div v-if="hasMore && !loading" class="my-4 ml-1 flex items-center justify-start">
+      <BaseButton
+        @click="loadMore"
+        class="rounded-full bg-[var(--timeline-load-more-bg-color)] !active:bg-[var(--timeline-load-more-active-bg-color)] mr-2"
+      >
+        <span
+          class="text-[var(--timeline-load-more-text-color)] text-md font-serif text-center px-2 py-1"
+          >加载更多</span
+        >
+      </BaseButton>
+    </div>
+    <!-- 没有更多 -->
+    <div v-if="!hasMore && !loading" class="mx-auto my-5 text-center">
+      <span class="text-xl text-[var(--text-color-400)]">没有啦！🎉</span>
+    </div>
+    <!-- 加载中 -->
+    <div v-if="loading" class="mx-auto my-5 text-center">
+      <span class="text-xl text-[var(--text-color-400)]">加载中...</span>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -12,10 +32,11 @@ import { storeToRefs } from 'pinia'
 import { useInboxStore } from '@/stores'
 import { fetchMarkInboxRead } from '@/service/api'
 import TheInboxCard from '@/components/advanced/TheInboxCard.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 const inboxStore = useInboxStore()
+const { items, hasMore, loading } = storeToRefs(inboxStore)
 const { loadMore } = inboxStore
-const { items, hasMore } = storeToRefs(inboxStore)
 
 let timer: ReturnType<typeof setInterval>
 

@@ -4,7 +4,12 @@
 
     <!-- 当前共有 -->
     <div class="text-[var(--text-color-400)] my-2 font-serif">
-      <p>当前共有 {{ items.length }} 条消息</p>
+      <p>当前消息共有 {{ total }} 条</p>
+    </div>
+
+    <!-- 未读消息共有 -->
+    <div class="text-[var(--text-color-400)] my-2 font-serif">
+      <p>未读消息共有 {{ unreadItems.length }} 条</p>
     </div>
   </div>
 </template>
@@ -14,5 +19,5 @@ import { storeToRefs } from 'pinia'
 import { useInboxStore } from '@/stores'
 
 const inboxStore = useInboxStore()
-const { items } = storeToRefs(inboxStore)
+const { unreadItems, total } = storeToRefs(inboxStore)
 </script>
