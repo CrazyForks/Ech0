@@ -248,6 +248,7 @@ var EventSet = wire.NewSet(
 	event.NewBackupScheduler,
 	event.NewDeadLetterResolver,
 	event.NewAgentProcessor,
+	event.NewInboxDispatcher,
 	event.NewEventHandlers,
 	event.NewEventRegistry,
 )

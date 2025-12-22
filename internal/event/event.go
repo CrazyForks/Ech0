@@ -29,6 +29,10 @@ const (
 	EventTypeUpdateBackupSchedule EventType = "system.update_backup_schedule" // 更新自动备份计划
 
 	EventTypeDeadLetterRetried EventType = "deadletter.retried" // 死信任务重试
+
+	EventTypeInboxClear EventType = "inbox.clear" // 清理Inbox（超过七天的已读消息）
+
+	EventTypeEch0UpdateCheck EventType = "ech0.update" // 检查 Ech0 版本更新
 )
 
 // 定义事件Payload的常用字段

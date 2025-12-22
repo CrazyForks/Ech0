@@ -17,6 +17,12 @@ type InboxRepositoryInterface interface {
 		search string,
 	) ([]*inboxModel.Inbox, int64, error)
 
+	// 获取指定 ID 的收件箱消息
+	GetInboxById(ctx context.Context, inboxID uint) (*inboxModel.Inbox, error)
+
+	// 更新收件箱消息
+	UpdateInbox(ctx context.Context, inbox *inboxModel.Inbox) error
+
 	// 标记消息为已读
 	MarkAsRead(ctx context.Context, inboxID uint) error
 
@@ -25,6 +31,9 @@ type InboxRepositoryInterface interface {
 
 	// 清空收件箱
 	ClearInbox(ctx context.Context) error
+
+	// 清空已读消息
+	ClearReadInboxByIds(ctx context.Context, inboxIDs []uint) error
 
 	// 获取所有未读消息
 	GetUnreadInbox(ctx context.Context) ([]*inboxModel.Inbox, error)

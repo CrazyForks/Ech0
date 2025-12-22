@@ -78,6 +78,20 @@ func (inboxRepository *InboxRepository) GetInboxList(
 	return inboxes, total, nil
 }
 
+// GetInboxById 获取指定 ID 的收件箱消息
+func (inboxRepository *InboxRepository) GetInboxById(ctx context.Context, inboxID uint) (*inboxModel.Inbox, error) {
+	var inbox inboxModel.Inbox
+	if err := inboxRepository.getDB(ctx).First(&inbox, inboxID).Error; err != nil {
+		return nil, err
+	}
+	return &inbox, nil
+}
+
+// UpdateInbox 更新收件箱消息
+func (inboxRepository *InboxRepository) UpdateInbox(ctx context.Context, inbox *inboxModel.Inbox) error {
+	return inboxRepository.getDB(ctx).Save(inbox).Error
+}
+
 // MarkAsRead 标记消息为已读
 func (inboxRepository *InboxRepository) MarkAsRead(ctx context.Context, inboxID uint) error {
 	result := inboxRepository.getDB(ctx).
@@ -127,4 +141,12 @@ func (inboxRepository *InboxRepository) GetUnreadInbox(
 		return nil, err
 	}
 	return inboxes, nil
+}
+
+// ClearReadInboxByIds 清空已读消息
+func (inboxRepository *InboxRepository) ClearReadInboxByIds(ctx context.Context, inboxIDs []uint) error {
+	return inboxRepository.getDB(ctx).
+		Where("id IN (?)", inboxIDs).
+		Update("read", true).
+		Error
 }

@@ -7,6 +7,7 @@ type EventHandlers struct {
 	fa  *FediverseAgent     // 联邦事件处理器
 	bs  *BackupScheduler    // 备份事件调度器
 	ap  *AgentProcessor     // Agent事件处理器
+	id  *InboxDispatcher    // Inbox事件处理器
 }
 
 // NewEventHandlers 创建一个新的事件处理器集合
@@ -16,8 +17,9 @@ func NewEventHandlers(
 	fa *FediverseAgent,
 	bs *BackupScheduler,
 	ap *AgentProcessor,
+	id *InboxDispatcher,
 ) *EventHandlers {
-	return &EventHandlers{wbd: wbd, dlr: dlr, fa: fa, bs: bs, ap: ap}
+	return &EventHandlers{wbd: wbd, dlr: dlr, fa: fa, bs: bs, ap: ap, id: id}
 }
 
 // EventRegistrar 事件注册器
@@ -67,6 +69,17 @@ func (er *EventRegistrar) Register() error {
 	if err != nil {
 		return err
 	}
+
+	// 订阅 Inbox 事件，交给 InboxDispatcher 处理
+	err = er.eb.Subscribes(
+		er.eh.id.Handle,
+		EventTypeEch0UpdateCheck,
+		EventTypeInboxClear,
+	) // 订阅 Inbox 事件，交给 InboxDispatcher 处理
+	if err != nil {
+		return err
+	}
+
 	// 订阅所有事件，交给 WebhookDispatcher 处理
 	err = er.eb.SubscribeAll(
 		er.eh.wbd.Handle,

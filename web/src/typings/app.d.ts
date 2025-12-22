@@ -514,7 +514,9 @@ declare namespace App {
         content: string
         type: string
         read: boolean
+        read_count: number
         meta?: string
+        read_at?: string
         created_at: string
       }
 

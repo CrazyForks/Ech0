@@ -132,6 +132,8 @@ const (
 	BackupScheduleKey = "backup_schedule"
 	// AgentSettingKey 是 Agent 设置的键
 	AgentSettingKey = "agent_setting"
+	// ReleaseVersionKey 是发布版本号的键
+	ReleaseVersionKey = "release_version"
 	// MigrationKey 是数据库迁移的标记键
 	MigrationKey = "db_migration:message_to_echo:v1"
 )
@@ -149,5 +151,5 @@ const (
 
 const (
 	// Version 是当前版本号
-	Version = "3.0.6"
+	Version = "3.0.3"
 )

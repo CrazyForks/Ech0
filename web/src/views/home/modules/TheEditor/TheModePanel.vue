@@ -92,12 +92,10 @@ const handleTodo = () => {
 }
 
 const handleInbox = () => {
-  theToast.info('收件箱 模式开发中...')
-  return
-  // setInboxMode(true)
-  // setTodoMode(false)
-  // editorStore.currentMode = Mode.INBOX
-  // theToast.info('已切换到 收件箱 模式')
+  setInboxMode(true)
+  setTodoMode(false)
+  editorStore.currentMode = Mode.INBOX
+  theToast.info('已切换到 收件箱 模式')
 }
 
 const handlePlayMusic = () => {
