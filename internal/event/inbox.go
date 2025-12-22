@@ -102,7 +102,7 @@ func (id *InboxDispatcher) handleInboxClear(ctx context.Context) error {
 		return err
 	}
 
-	// 清理已读的存在超过七天的消息
+	// 清理已读的存在超过五天的消息
 	var unreadInboxIDs []uint
 	for _, inbox := range unreadInbox {
 		// 如果消息已读并且创建时间超过七天，则清理
