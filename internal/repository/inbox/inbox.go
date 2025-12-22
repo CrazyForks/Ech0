@@ -62,7 +62,8 @@ func (inboxRepository *InboxRepository) GetInboxList(
 		return nil, 0, err
 	}
 
-	query = query.Order("created_at DESC")
+	// 以创建时间倒序（最新在前）；同一时间戳内用 id 倒序保证稳定排序
+	query = query.Order("created_at DESC").Order("id DESC")
 
 	if offset > 0 {
 		query = query.Offset(offset)
@@ -136,7 +137,8 @@ func (inboxRepository *InboxRepository) GetUnreadInbox(
 	var inboxes []*inboxModel.Inbox
 	if err := inboxRepository.getDB(ctx).
 		Where("read = ?", false).
-		Order("created_at DESC").
+		// 以创建时间倒序（最新在前）；同一时间戳内用 id 倒序保证稳定排序
+		Order("created_at DESC").Order("id DESC").
 		Find(&inboxes).Error; err != nil {
 		return nil, err
 	}
