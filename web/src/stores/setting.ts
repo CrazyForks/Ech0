@@ -226,7 +226,6 @@ export const useSettingStore = defineStore('settingStore', () => {
     getCommentSetting()
     getS3Setting()
     getAgentInfo()
-    getOAuth2Setting()
     getHelloEch0()
   }
 

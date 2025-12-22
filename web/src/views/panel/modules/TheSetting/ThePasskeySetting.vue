@@ -6,7 +6,7 @@
       </div>
 
       <div class="text-[var(--text-color-next-400)] text-sm mb-3">
-        使用 Passkey（WebAuthn）可在不同设备上无密码登录；删除某设备后，该设备将无法再登录。
+        使用 Passkey（WebAuthn）可在不同设备上无密码登录
       </div>
 
       <!-- 绑定 -->
