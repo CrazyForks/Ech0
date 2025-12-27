@@ -50,7 +50,7 @@
     </div>
 
     <!-- 智能压缩 -->
-    <div class="mb-3 flex items-center">
+    <div v-if="imageToAdd.image_source !== ImageSource.URL" class="mb-3 flex items-center">
       <span class="text-[var(--text-color-500)]">智能压缩：</span>
       <BaseSwitch v-model="enableCompressor" />
     </div>
