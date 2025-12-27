@@ -31,8 +31,10 @@
               >
                 <button
                   @click="
-                    handleFilterByTag(tag)
-                    close()
+                    () => {
+                      handleFilterByTag(tag)
+                      close()
+                    }
                   "
                   title="按标签过滤内容"
                   class="flex items-center justify-center rounded-md p-1 transition duration-150 ease-in-out hover:bg-[var(--bg-color-100)] focus:outline-none focus-visible:ring focus-visible:ring-orange-500/50"
@@ -42,8 +44,10 @@
                 <div class="w-px bg-[var(--bg-color-300)]"></div>
                 <button
                   @click="
-                    handleDeleteTag(tag.id)
-                    close()
+                    () => {
+                      handleDeleteTag(tag.id)
+                      close()
+                    }
                   "
                   title="删除该标签"
                   class="flex items-center justify-center rounded-md p-1 transition duration-150 ease-in-out hover:bg-red-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500/50"
