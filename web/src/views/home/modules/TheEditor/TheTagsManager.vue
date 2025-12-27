@@ -3,7 +3,7 @@
     <h2 class="text-[var(--text-color-500)] font-bold mb-2">标签管理</h2>
     <p class="text-xs text-[var(--text-color-next-300)] mb-3">Tip: 点击标签可以按标签过滤或删除</p>
     <div class="flex flex-wrap gap-2">
-      <Popover v-for="tag in tagList" :key="tag.id" class="relative">
+      <Popover v-for="tag in tagList" :key="tag.id" class="relative" v-slot="{ close }">
         <PopoverButton
           class="flex items-center gap-1 border rounded-sm border-gray-300 border-dashed py-0.5 px-1 mb-1 hover:bg-[var(--bg-color-50)] outline-none"
           style="white-space: nowrap"
@@ -30,19 +30,25 @@
                 class="relative flex justify-around gap-2 bg-[var(--bg-color-50)] p-1 text-[var(--text-color-500)]"
               >
                 <button
-                  @click="handleFilterByTag(tag)"
+                  @click="
+                    handleFilterByTag(tag)
+                    close()
+                  "
                   title="按标签过滤内容"
                   class="flex items-center justify-center rounded-md p-1 transition duration-150 ease-in-out hover:bg-[var(--bg-color-100)] focus:outline-none focus-visible:ring focus-visible:ring-orange-500/50"
                 >
-                  <Filter class="w-4 h-4" />
+                  <Filter class="w-5 h-5" />
                 </button>
                 <div class="w-px bg-[var(--bg-color-300)]"></div>
                 <button
-                  @click="handleDeleteTag(tag.id)"
+                  @click="
+                    handleDeleteTag(tag.id)
+                    close()
+                  "
                   title="删除该标签"
                   class="flex items-center justify-center rounded-md p-1 transition duration-150 ease-in-out hover:bg-red-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500/50"
                 >
-                  <Trashbin class="w-4 h-4" />
+                  <Trashbin class="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -69,9 +75,22 @@ const { openConfirm } = useBaseDialog()
 
 // 按标签过滤内容
 const handleFilterByTag = (tag: App.Api.Ech0.Tag) => {
+  const wasFiltering = echoStore.isFilteringMode
+
+  // 重置状态
+  echoStore.filteredTag = null
+  echoStore.refreshEchosForFilter()
+
   if (tag) {
+    // 开始过滤
     echoStore.filteredTag = tag
     echoStore.isFilteringMode = true
+
+    // 如果已经在过滤模式下（组件已挂载），需要手动触发获取数据
+    // 如果不是在过滤模式下，切换会导致组件挂载，onMounted会自动获取数据
+    if (wasFiltering) {
+      echoStore.getEchosByPageForFilter()
+    }
   }
 }
 
