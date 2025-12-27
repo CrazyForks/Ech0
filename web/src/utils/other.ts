@@ -228,3 +228,14 @@ export function uint8ArrayToBase64url(bytes: ArrayBuffer | Uint8Array): string {
   const base64 = btoa(binary)
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
 }
+
+export function isSafari(): boolean {
+  const ua = navigator.userAgent
+  // Exclude Chrome, Chromium-based Edge, and iOS Chrome/Firefox
+  return (
+    ua.includes('Safari') &&
+    !ua.includes('Chrome') &&
+    !ua.includes('CriOS') &&
+    !ua.includes('FxiOS')
+  )
+}
