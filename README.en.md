@@ -339,6 +339,7 @@ Thank you to all the friends who have supported this project! Your contributions
 |       🧑‍💻 [@Rvn0xsy](https://github.com/Rvn0xsy)       | 2025-11-12 | Great project, I will keep following! |
 |                     🧑‍💻 王贼臣                     | 2025-11-20 | Thanks www.cardopt.cn             |
 |       🧑‍💻 [@ljxme](https://github.com/ljxme)    | 2025-11-30 | Doing my humble part 😋             |
+|       🧑‍💻 [@he9ab2l](https://github.com/he9ab2l)    | 2025-12-23 | None            |
 
 ---
 
