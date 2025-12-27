@@ -146,17 +146,17 @@ export const parseMusicURL = (url: string) => {
 export const extractAndCleanMusicURL = (input: string): string | null => {
   const text = input.trim()
 
-  // 1️⃣ 粗暴提取第一个 URL（足够鲁棒）
+  // 粗暴提取第一个 URL（足够鲁棒）
   const urlMatch = text.match(/https?:\/\/[^\s]+/i)
   if (!urlMatch) return null
 
   const rawUrl = urlMatch[0]
 
-  // 2️⃣ 复用统一解析函数
+  // 复用统一解析函数
   const parsed = parseMusicURL(rawUrl)
   if (!parsed) return null
 
-  // 3️⃣ 规范化重组
+  // 规范化重组
   switch (parsed.server) {
     case MusicProvider.NETEASE: {
       // 统一为 PC 可打开的最短链接
@@ -187,20 +187,6 @@ export const extractAndCleanMusicURL = (input: string): string | null => {
     default:
       return null
   }
-}
-
-// 获取图片尺寸
-export function getImageSize(imgUrl: string): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => {
-      resolve({ width: img.width, height: img.height })
-    }
-    img.onerror = (err) => {
-      reject(err)
-    }
-    img.src = imgUrl
-  })
 }
 
 // 获取 HubEcho 的图片
