@@ -21,9 +21,16 @@ import { formatHubDate } from '../utils/formatHubDate'
 // 必须保持 defineAsyncComponent。改回静态 import 会让 TheImageGallery 进入 entry chunk
 // 的静态依赖图，与 index 形成循环引用 → 运行时 `A is not a function`（Vue 的 isFunction
 // 在 var 提升后尚未赋值时被调用）。详见 commit 51630d20 之后的 hub.ech0.app 事故。
-const TheImageGallery = defineAsyncComponent(
-  () => import('@/components/advanced/gallery/TheImageGallery.vue'),
-)
+const TheImageGallery = defineAsyncComponent({
+  loader: () => import('@/components/advanced/gallery/TheImageGallery.vue'),
+  onError(error, retry, fail, attempts) {
+    if (attempts <= 3) {
+      retry()
+    } else {
+      fail()
+    }
+  },
+})
 
 type Echo = App.Api.Hub.Echo
 
