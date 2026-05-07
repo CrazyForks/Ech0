@@ -6,6 +6,23 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 
 For releases prior to v4.6.5, see the [GitHub releases page](https://github.com/lin-snow/Ech0/releases) — earlier release notes are not retroactively imported here.
 
+## [4.7.5] - 2026-05-07
+
+### Added
+
+- **`AGENTS.md`** provides a compact reference for AI agents working in the Ech0 repository. Documents the project architecture, available `make` / `pnpm` commands, backend layering, Wire DI, event bus, frontend build output, and key in-repo docs.
+- **`justfile`** adds a `just` task runner mirroring all Makefile recipes, giving developers who prefer `just` a first-class workflow.
+
+### Changed
+
+- **SMTP sender address** can now be configured independently of `SMTPUsername`. A new `SMTPSender` field in `EmailNotifySetting` lets operators set the envelope `From:` address that actually appears in outbound comment-notification emails — useful when the SMTP provider requires a fixed sender (e.g. Postmark, SES) while credentials differ. The panel's comment-manager UI exposes the new field; existing deployments fall back to `SMTPUsername` when the field is empty.
+- **`BaseSelect` component** restyled: the trigger button and dropdown now use CSS custom properties (`--select-*`) for background, border, focus ring, and disabled states, matching the rest of the design system. Keyboard navigation (↑/↓/Enter/Space/Escape) and `aria-expanded` semantics are unchanged.
+- **Hub `TheImageGallery` async loader** now retries up to 3 times on chunk-load failure before surfacing the error, reducing transient failures on flaky networks.
+
+### Internal
+
+- **Dependency bumps (`web/`)**: `vue` 3.5.33 → 3.5.34, `vue-i18n` 11.4.0 → 11.4.2, `eslint-plugin-vue` 10.9.0 → 10.9.1, `jiti` 2.6.1 → 2.7.0, `stylelint` 17.10.0 → 17.11.0, `vite` 8.0.10 → 8.0.11, `vue-tsc` 3.2.7 → 3.2.8.
+
 ## [4.7.4] - 2026-05-04
 
 ### Changed
@@ -123,7 +140,8 @@ This is primarily a security release: six advisories disclosed since v4.7.2 are 
 
   Practical risk in this repo was negligible (the vulnerable code only runs at PWA build time on developer-controlled input), but the alerts are now resolved at the supply-chain level.
 
-[Unreleased]: https://github.com/lin-snow/Ech0/compare/v4.7.4...HEAD
+[Unreleased]: https://github.com/lin-snow/Ech0/compare/v4.7.5...HEAD
+[4.7.5]: https://github.com/lin-snow/Ech0/compare/v4.7.4...v4.7.5
 [4.7.4]: https://github.com/lin-snow/Ech0/compare/v4.7.3...v4.7.4
 [4.7.3]: https://github.com/lin-snow/Ech0/compare/v4.7.2...v4.7.3
 [4.7.2]: https://github.com/lin-snow/Ech0/compare/v4.7.1...v4.7.2
