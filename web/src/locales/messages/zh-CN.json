@@ -214,6 +214,8 @@
     "smtpHostPlaceholder": "SMTP Host",
     "smtpPortPlaceholder": "SMTP Port",
     "smtpUsernamePlaceholder": "SMTP 用户名",
+    "smtpSenderPlaceholder": "发件人邮箱（From）",
+    "smtpSenderHint": "可选。若 SMTP 用户名不是邮箱格式，请在此填写发件人邮箱。",
     "smtpPasswordPlaceholder": "SMTP 密码",
     "smtpPasswordKeepPlaceholder": "留空保持当前密码",
     "smtpPasswordSavedHint": "密码已保存；当前留空表示不修改。"

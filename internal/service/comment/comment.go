@@ -650,6 +650,7 @@ func (s *CommentService) sendOwnerMail(ctx context.Context, cfg model.EmailNotif
 		Port:     cfg.SMTPPort,
 		Username: strings.TrimSpace(cfg.SMTPUsername),
 		Password: cfg.SMTPPassword,
+		Sender:   strings.TrimSpace(cfg.SMTPSender),
 	}, msg)
 }
 
@@ -689,8 +690,12 @@ func validateEmailNotifySetting(cfg model.EmailNotifySetting, ownerEmail string)
 	if strings.TrimSpace(cfg.SMTPUsername) == "" {
 		return errors.New("SMTP Username 不能为空")
 	}
-	if _, err := mail.ParseAddress(strings.TrimSpace(cfg.SMTPUsername)); err != nil {
-		return errors.New("SMTP Username 邮箱格式无效")
+	sender := strings.TrimSpace(cfg.SMTPSender)
+	if sender == "" {
+		sender = strings.TrimSpace(cfg.SMTPUsername)
+	}
+	if _, err := mail.ParseAddress(sender); err != nil {
+		return errors.New("发件人邮箱格式无效（请检查 SMTP 发件人地址）")
 	}
 	if strings.TrimSpace(cfg.SMTPPassword) == "" {
 		return errors.New("SMTP Password 不能为空")

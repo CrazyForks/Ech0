@@ -21,7 +21,10 @@ func NewGoMailSender() *GoMailSender {
 func (s *GoMailSender) Send(ctx context.Context, cfg MailerConfig, msg MailMessage) error {
 	host := strings.TrimSpace(cfg.Host)
 	to := strings.TrimSpace(msg.To)
-	from := strings.TrimSpace(cfg.Username)
+	from := strings.TrimSpace(cfg.Sender)
+	if from == "" {
+		from = strings.TrimSpace(cfg.Username)
+	}
 	if host == "" || to == "" || from == "" {
 		return fmt.Errorf("missing mail configuration")
 	}

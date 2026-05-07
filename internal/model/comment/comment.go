@@ -163,6 +163,7 @@ type EmailNotifySetting struct {
 	SMTPUsername    string `json:"smtp_username"`
 	SMTPPassword    string `json:"smtp_password,omitempty"`
 	SMTPPasswordSet bool   `json:"smtp_password_set,omitempty"`
+	SMTPSender      string `json:"smtp_sender"`
 }
 
 type TestEmailRequest struct {

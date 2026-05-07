@@ -558,6 +558,7 @@ declare namespace App {
           smtp_username: string
           smtp_password?: string
           smtp_password_set?: boolean
+          smtp_sender: string
         }
       }
     }

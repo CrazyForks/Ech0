@@ -214,6 +214,8 @@
     "smtpHostPlaceholder": "SMTP-Host",
     "smtpPortPlaceholder": "SMTP-Port",
     "smtpUsernamePlaceholder": "SMTP-Benutzername",
+    "smtpSenderPlaceholder": "Absender-E-Mail (From)",
+    "smtpSenderHint": "Optional. Falls Ihr SMTP-Benutzername keine E-Mail-Adresse ist, tragen Sie hier Ihre Absender-Adresse ein.",
     "smtpPasswordPlaceholder": "SMTP-Passwort",
     "smtpPasswordKeepPlaceholder": "Leer lassen, um aktuelles Passwort beizubehalten",
     "smtpPasswordSavedHint": "Passwort ist bereits gespeichert; leer lassen bedeutet unverändert übernehmen."

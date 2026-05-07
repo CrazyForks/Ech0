@@ -81,6 +81,13 @@
               :placeholder="t('commentManager.smtpUsernamePlaceholder')"
             />
             <BaseInput
+              v-model.trim="setting.email_notify.smtp_sender"
+              :placeholder="t('commentManager.smtpSenderPlaceholder')"
+            />
+            <p class="md:col-span-2 text-xs text-[var(--color-text-muted)]">
+              {{ t('commentManager.smtpSenderHint') }}
+            </p>
+            <BaseInput
               v-model="setting.email_notify.smtp_password"
               type="password"
               :placeholder="
@@ -351,6 +358,7 @@ const setting = reactive<App.Api.Comment.SystemSetting>({
     smtp_username: '',
     smtp_password: '',
     smtp_password_set: false,
+    smtp_sender: '',
   },
 })
 const settingSaving = ref(false)
@@ -458,6 +466,7 @@ const buildSettingPayload = (): App.Api.Comment.SystemSetting => {
       smtp_username: String(setting.email_notify.smtp_username || '').trim(),
       smtp_password: String(setting.email_notify.smtp_password || ''),
       smtp_password_set: Boolean(setting.email_notify.smtp_password_set),
+      smtp_sender: String(setting.email_notify.smtp_sender || '').trim(),
     },
   }
 }

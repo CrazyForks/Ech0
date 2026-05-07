@@ -91,6 +91,7 @@ type MailerConfig struct {
 	Port     int
 	Username string
 	Password string
+	Sender   string
 }
 
 type Mailer interface {
